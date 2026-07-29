@@ -14,12 +14,19 @@ public class Shot : MonoBehaviour
     [SerializeField] private float maxAimDistance = 100f;
     private float nextShotTime = 0f;
 
+    [Header("Sonido")]
+    [SerializeField] private AudioClip shootSound;
+    [SerializeField] private AudioSource audioSource; // asigna un AudioSource (puede estar en esta misma arma)
+
     private InputAction fireAction;
 
     private void Awake()
     {
-        PlayerInput playerInput = GetComponent<PlayerInput>();
+        PlayerInput playerInput = GetComponentInParent<PlayerInput>();
         fireAction = playerInput.actions["Fire"];
+
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -52,5 +59,8 @@ public class Shot : MonoBehaviour
         GameObject newBullet = Instantiate(bullet, spawnPoint.position, Quaternion.LookRotation(shootDirection));
         newBullet.GetComponent<Rigidbody>().AddForce(shootDirection * shotForce);
         Destroy(newBullet, 2f);
+
+        if (shootSound != null && audioSource != null)
+            audioSource.PlayOneShot(shootSound);
     }
 }
