@@ -34,12 +34,17 @@ public class Shot : MonoBehaviour
     [SerializeField] private AudioSource audioSource; // asigna un AudioSource (puede estar en esta misma arma)
 
     private InputAction fireAction;
+    private InputAction reloadAction;
     private float nextShotTime = 0f;
 
     private void Awake()
     {
         PlayerInput playerInput = GetComponentInParent<PlayerInput>();
-        if (playerInput != null) fireAction = playerInput.actions["Fire"];
+        if (playerInput != null)
+        {
+            fireAction = playerInput.actions.FindAction("Fire");
+            reloadAction = playerInput.actions.FindAction("Reload");
+        }
 
         if (audioSource == null)
             audioSource = GetComponent<AudioSource>();
@@ -50,10 +55,13 @@ public class Shot : MonoBehaviour
 
     private void Update()
     {
-        // Recargar con R. (De momento leido directo del teclado; se movera a las
-        // acciones del proyecto cuando se revise el mapa de input en la Fase 3.)
-        if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
-            Reload();
+        // Recargar: accion "Reload" del asset de input (tecla R), igual que Fire.
+        // Antes se leia el teclado directo y no llegaba a detectarse la pulsacion.
+        bool reloadPressed = reloadAction != null
+            ? reloadAction.WasPressedThisFrame()
+            : (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame);
+
+        if (reloadPressed) Reload();
 
         if (fireAction == null || !fireAction.IsPressed()) return;
         if (Time.time < nextShotTime) return;

@@ -37,10 +37,59 @@ public class WeaponAmmo : MonoBehaviour
     /// <summary>Se dispara cuando se intenta disparar sin balas.</summary>
     public event Action OnEmptyTrigger;
 
+    [Header("Recarga automatica")]
+    [Tooltip("Recarga sola en cuanto el cargador se queda vacio.")]
+    [SerializeField] private bool autoReloadWhenEmpty = true;
+    [Tooltip("Retardo antes de recargar sola (deja sonar el click seco).")]
+    [SerializeField] private float autoReloadDelay = 0.25f;
+
+    private float emptySince = -1f;
+
+    private void Update()
+    {
+        if (!autoReloadWhenEmpty) return;
+
+        if (IsReloading || Magazine > 0 || Reserve <= 0)
+        {
+            emptySince = -1f;
+            return;
+        }
+
+        if (emptySince < 0f)
+        {
+            emptySince = Time.time;
+            return;
+        }
+
+        if (Time.time - emptySince >= autoReloadDelay)
+        {
+            emptySince = -1f;
+            StartReload();
+        }
+    }
+
+    private bool initialized;
+
     private void Awake()
     {
+        Initialize();
+    }
+
+    private void OnEnable()
+    {
+        // Un arma que empieza desactivada no ejecuta Awake hasta que se equipa:
+        // inicializamos tambien aqui para que nunca arranque con 0 balas.
+        Initialize();
+    }
+
+    private void Initialize()
+    {
+        if (initialized) return;
+        initialized = true;
+
         Magazine = magazineSize;
         Reserve = Mathf.Clamp(startingReserve, 0, maxReserve);
+
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
     }
 
