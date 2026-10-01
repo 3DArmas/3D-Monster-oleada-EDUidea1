@@ -149,7 +149,8 @@ public class ZombieController : MonoBehaviour, IDamageable
 
     private void UpdateAnimator()
     {
-        if (animator == null) return;
+        // Sin AnimatorController asignado, esto escupiria un warning por frame y por zombie.
+        if (animator == null || animator.runtimeAnimatorController == null) return;
 
         animator.SetFloat("Speed", agent.velocity.magnitude);
         animator.SetBool("IsAttacking", currentState == State.Attack);
