@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -16,6 +17,10 @@ public class ZombieController : MonoBehaviour, IDamageable
     [SerializeField] private float patrolSpeed = 1.5f;
     [SerializeField] private float chaseSpeed = 3.5f;
 
+    [Header("Recompensa")]
+    [Tooltip("Dinero que suelta al morir (GDD: normal 100, rapido 150, trepador 175, tanque 300, mini boss 1000).")]
+    [SerializeField] private int reward = 100;
+
     private float currentHealth;
     private NavMeshAgent agent;
     private Animator animator;
@@ -24,6 +29,20 @@ public class ZombieController : MonoBehaviour, IDamageable
 
     private enum State { Idle, Chase, Attack, Dead }
     private State currentState = State.Idle;
+
+    /// <summary>Dinero que otorga al morir.</summary>
+    public int Reward => reward;
+
+    /// <summary>Se dispara cuando muere cualquier zombie: lo escuchan RoundManager y GameManager.</summary>
+    public static event Action<ZombieController> OnAnyZombieDied;
+
+    /// <summary>Aplica el escalado de dificultad de la ronda. Lo llama RoundManager al instanciarlo.</summary>
+    public void ApplyScaling(float healthMultiplier, float damageMultiplier)
+    {
+        maxHealth *= Mathf.Max(0.01f, healthMultiplier);
+        damage *= Mathf.Max(0.01f, damageMultiplier);
+        currentHealth = maxHealth;
+    }
 
     private void Awake()
     {
@@ -121,6 +140,10 @@ public class ZombieController : MonoBehaviour, IDamageable
             animator.SetTrigger("Die");
 
         GetComponent<Collider>().enabled = false;
+
+        // Avisa a los sistemas de partida (dinero y recuento de la ronda).
+        OnAnyZombieDied?.Invoke(this);
+
         Destroy(gameObject, 5f);
     }
 
