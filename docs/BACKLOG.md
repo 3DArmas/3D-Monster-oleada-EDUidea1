@@ -18,6 +18,13 @@
 - [ ] Al morir se muestra el resumen y se puede reiniciar.
 - [ ] 60 fps con 24 zombies simultáneos en el blockout.
 
+**Estado real (1 oct 2026):**
+- ✅ **WU-1.1** Núcleo de partida · ✅ **WU-1.2** Recompensa por eliminación · ✅ **WU-1.4** Munición y recarga
+- 🟡 **WU-1.7** Game over: **lógica terminada y verificada**, falta la pantalla de resumen
+- ⏳ Pendientes: **WU-1.3** HUD · **WU-1.5** Cuchillo · **WU-1.6** Tienda (cubo + E) · **WU-1.8** Blockout
+- Verificado en Play mode: ronda 1 con 8 zombies, **$100 por baja** (matar 2 → $200), vivos 8→6, el jugador
+  recibe daño real (100→10→0) y al morir el estado pasa a `GameOver` con la ronda detenida.
+
 ### WU-1.1 — Núcleo de partida
 **Entregable:** `GameManager` (estados: `Preparando`, `Ronda`, `Tienda`, `GameOver`), `RoundManager` (número de ronda, composición, detección de fin de ronda), `MoneySystem` (dinero, sumar/gastar, eventos).
 **Aceptación:**
