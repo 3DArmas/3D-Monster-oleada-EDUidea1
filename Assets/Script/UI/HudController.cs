@@ -106,7 +106,9 @@ public class HudController : MonoBehaviour
 
     private void HandleAmmoChanged(int magazine, int reserve)
     {
-        RefreshWeapon();
+        // OJO: antes esto llamaba a RefreshWeapon(), que sale sin hacer nada si el arma
+        // activa no ha cambiado... por eso el contador se quedaba clavado al disparar.
+        UpdateAmmoText();
     }
 
     private void HandleRoundStarted(int round)
@@ -143,16 +145,22 @@ public class HudController : MonoBehaviour
         if (!force && current == activeWeapon) return;
 
         activeWeapon = current;
+        UpdateAmmoText();
+    }
 
-        if (current == null)
+    /// <summary>Escribe la municion del arma activa. Se llama en cada cambio de balas.</summary>
+    private void UpdateAmmoText()
+    {
+        if (activeWeapon == null)
         {
             if (ammoText != null) ammoText.text = "-- / --";
             if (weaponText != null) weaponText.text = string.Empty;
             return;
         }
 
-        if (ammoText != null) ammoText.text = current.Magazine + " / " + current.Reserve;
-        if (weaponText != null) weaponText.text = current.WeaponName;
+        if (ammoText != null) ammoText.text = activeWeapon.Magazine + " / " + activeWeapon.Reserve;
+        if (weaponText != null)
+            weaponText.text = activeWeapon.IsReloading ? "RECARGANDO..." : activeWeapon.WeaponName;
     }
 
     public void ShowMessage(string text, float duration)
