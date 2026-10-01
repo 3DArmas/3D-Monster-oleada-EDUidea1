@@ -89,12 +89,15 @@ public class ShopUI : MonoBehaviour
 
     public void BuyAmmo()
     {
+        // Comprobamos ANTES de cobrar: si la reserva esta llena no se gasta el dinero.
+        WeaponAmmo weapon = GetActiveWeapon();
+        if (weapon == null) { ShowInfo("No tienes arma equipada.", 2f); return; }
+        if (weapon.Reserve >= weapon.MaxReserve) { ShowInfo("Ya llevas la municion al maximo.", 2f); return; }
+
         Buy(ammoPrice, () =>
         {
-            WeaponAmmo weapon = GetActiveWeapon();
-            if (weapon == null) { ShowInfo("No tienes arma equipada.", 2f); return; }
             int added = weapon.AddReserve(ammoAmount);
-            ShowInfo(added > 0 ? "Municion: +" + added : "Ya llevas la municion al maximo.", 2f);
+            ShowInfo("Municion: +" + added, 2f);
         });
     }
 
@@ -109,6 +112,13 @@ public class ShopUI : MonoBehaviour
 
     public void BuyMedkit()
     {
+        // Igual que la municion: con la vida llena no se cobra.
+        if (playerHealth != null && playerHealth.CurrentHealth >= playerHealth.MaxHealth)
+        {
+            ShowInfo("Ya tienes la vida al maximo.", 2f);
+            return;
+        }
+
         Buy(medkitPrice, () =>
         {
             if (playerHealth != null) playerHealth.Heal(medkitHeal);
