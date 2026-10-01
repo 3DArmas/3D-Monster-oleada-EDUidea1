@@ -1012,6 +1012,14 @@ PrefabInstance:
       propertyPath: shotRate
       value: 0.25
       objectReference: {fileID: 0}
+    - target: {fileID: 1694322570579636112, guid: 577c6d6b2a504d0438b3b9b518257f80, type: 3}
+      propertyPath: m_Volume
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5926694543909715318, guid: 577c6d6b2a504d0438b3b9b518257f80, type: 3}
+      propertyPath: m_Volume
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 6498513584148972295, guid: 577c6d6b2a504d0438b3b9b518257f80, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3.25
@@ -1055,6 +1063,14 @@ PrefabInstance:
     - target: {fileID: 6928274526748635117, guid: 577c6d6b2a504d0438b3b9b518257f80, type: 3}
       propertyPath: m_Name
       value: Player(Body)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7601998031996675518, guid: 577c6d6b2a504d0438b3b9b518257f80, type: 3}
+      propertyPath: m_Volume
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7960918900061337764, guid: 577c6d6b2a504d0438b3b9b518257f80, type: 3}
+      propertyPath: damage
+      value: 45
       objectReference: {fileID: 0}
     - target: {fileID: 7960918900061337764, guid: 577c6d6b2a504d0438b3b9b518257f80, type: 3}
       propertyPath: shotRate
