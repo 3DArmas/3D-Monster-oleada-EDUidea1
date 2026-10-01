@@ -79,18 +79,30 @@ public class ZombieController : MonoBehaviour, IDamageable
         UpdateAnimator();
     }
 
+    /// <summary>El agente esta listo para recibir ordenes (activo y colocado sobre el NavMesh).</summary>
+    private bool AgentReady => agent != null && agent.enabled && agent.isOnNavMesh;
+
     private void EnterIdleState()
     {
         if (currentState == State.Dead) return;
         currentState = State.Idle;
-        agent.speed = patrolSpeed;
-        agent.isStopped = true;
+
+        if (AgentReady)
+        {
+            agent.speed = patrolSpeed;
+            agent.isStopped = true;
+        }
     }
 
     private void EnterChaseState()
     {
         if (currentState == State.Dead) return;
         currentState = State.Chase;
+
+        // Sin esta comprobacion, un zombie fuera del NavMesh (o con el agente
+        // desactivado) lanzaba dos errores por frame.
+        if (!AgentReady) return;
+
         agent.speed = chaseSpeed;
         agent.isStopped = false;
         agent.SetDestination(player.position);
@@ -100,7 +112,7 @@ public class ZombieController : MonoBehaviour, IDamageable
     {
         if (currentState == State.Dead) return;
         currentState = State.Attack;
-        agent.isStopped = true;
+        if (AgentReady) agent.isStopped = true;
 
         Vector3 dir = (player.position - transform.position).normalized;
         if (dir != Vector3.zero)
@@ -133,8 +145,8 @@ public class ZombieController : MonoBehaviour, IDamageable
     private void Die()
     {
         currentState = State.Dead;
-        agent.isStopped = true;
-        agent.enabled = false;
+        if (AgentReady) agent.isStopped = true;
+        if (agent != null) agent.enabled = false;
 
         if (animator != null)
             animator.SetTrigger("Die");
