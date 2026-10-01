@@ -140,8 +140,10 @@ public class RoundManager : MonoBehaviour
         {
             if (alive.Count < maxAlive)
             {
-                SpawnOne();
+                // Se descuenta ANTES de instanciar: asi el aviso al HUD (que sale
+                // dentro de SpawnOne) ya cuenta el zombie como desplegado.
                 pendingToSpawn--;
+                SpawnOne();
             }
             yield return new WaitForSeconds(interval);
         }
