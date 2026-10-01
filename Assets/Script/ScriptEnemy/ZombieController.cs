@@ -151,7 +151,9 @@ public class ZombieController : MonoBehaviour, IDamageable
         if (animator != null)
             animator.SetTrigger("Die");
 
-        GetComponent<Collider>().enabled = false;
+        // Desactiva TODOS los colliders (el del root y los de los huesos) para que el
+        // cadaver no bloquee al jugador y se pueda pasar por encima.
+        foreach (var col in GetComponentsInChildren<Collider>()) col.enabled = false;
 
         // Avisa a los sistemas de partida (dinero y recuento de la ronda).
         OnAnyZombieDied?.Invoke(this);
