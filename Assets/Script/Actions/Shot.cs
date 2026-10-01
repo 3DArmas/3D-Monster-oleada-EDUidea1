@@ -63,6 +63,10 @@ public class Shot : MonoBehaviour
 
         if (reloadPressed) Reload();
 
+        // Con la tienda abierta, o apuntando al cubo de la tienda, el clic sirve
+        // para interactuar: no se dispara.
+        if (ShopUI.IsAnyOpen || ShopInteractable.PointerOnShop) return;
+
         if (fireAction == null || !fireAction.IsPressed()) return;
         if (Time.time < nextShotTime) return;
 
