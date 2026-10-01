@@ -15,10 +15,15 @@ public class Shot : MonoBehaviour
     [SerializeField] private WeaponAmmo ammo;
 
     [Header("Disparo")]
-    [SerializeField] private float shotForce = 1500f;
+    [Tooltip("Velocidad de la bala en m/s. Se le da directamente (con AddForce la bala arrancaba parada y fallaba).")]
+    [SerializeField] private float bulletSpeed = 60f;
     [Tooltip("Segundos entre disparos (GDD pistola: 0.25 = 4 disparos por segundo).")]
     [SerializeField] private float shotRate = 0.25f;
     [SerializeField] private float maxAimDistance = 100f;
+
+    [Header("Dano")]
+    [Tooltip("Dano por bala. GDD: pistola 25, rifle 45 (4 disparos para matar a un zombie de 100).")]
+    [SerializeField] private float damage = 25f;
 
     [Header("Recarga")]
     [Tooltip("Recarga sola al quedarse sin balas.")]
@@ -89,9 +94,21 @@ public class Shot : MonoBehaviour
         // 2. La bala nace en la punta del arma, pero su direccion va hacia aimPoint
         Vector3 shootDirection = (aimPoint - spawnPoint.position).normalized;
 
-        GameObject newBullet = Instantiate(bullet, spawnPoint.position, Quaternion.LookRotation(shootDirection));
-        newBullet.GetComponent<Rigidbody>().AddForce(shootDirection * shotForce);
-        Destroy(newBullet, 2f);
+        // 3. La bala nace un poco por delante del muzzle y sale con velocidad inmediata
+        GameObject newBullet = Instantiate(bullet, spawnPoint.position + shootDirection * 0.2f, Quaternion.LookRotation(shootDirection));
+
+        Rigidbody rb = newBullet.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.useGravity = false;
+            rb.linearVelocity = shootDirection * bulletSpeed;
+        }
+
+        // 4. La bala aplica el dano del arma al chocar con un IDamageable
+        Bullet bulletLogic = newBullet.GetComponent<Bullet>();
+        if (bulletLogic != null) bulletLogic.SetDamage(damage);
+
+        Destroy(newBullet, 3f);
 
         if (shootSound != null && audioSource != null)
             audioSource.PlayOneShot(shootSound);
