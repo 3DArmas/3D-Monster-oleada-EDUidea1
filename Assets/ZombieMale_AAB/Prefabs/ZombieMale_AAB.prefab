@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4185594555157654890}
   - component: {fileID: 757933503436870543}
   - component: {fileID: -9138736745395149745}
+  - component: {fileID: 487933316167440255}
   m_Layer: 0
   m_Name: ZombieMale_AAB
   m_TagString: Untagged
@@ -121,6 +122,33 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!54 &487933316167440255
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1993608188771188032}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 0
+  m_CollisionDetection: 3
 --- !u!1001 &1215446029693094941
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -135,7 +163,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7850afb9a2f50ad418017a419774a6b7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.19529182
+      value: -0.16770819
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7850afb9a2f50ad418017a419774a6b7, type: 3}
       propertyPath: m_LocalPosition.z

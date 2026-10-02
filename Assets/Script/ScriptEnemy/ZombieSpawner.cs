@@ -48,6 +48,16 @@ public class ZombieSpawner : MonoBehaviour
         var zc = zombie.GetComponent<ZombieController>();
         if (zc != null) zc.enabled = true;
 
+        // Pegar el zombie al NavMesh nada mas nacer. Sin esto se queda a la altura del
+        // punto de spawn (y = 0.3) y da la sensacion de que flota hasta que empieza a andar.
+        var agente = zombie.GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agente != null)
+        {
+            UnityEngine.AI.NavMeshHit suelo;
+            if (UnityEngine.AI.NavMesh.SamplePosition(point.position, out suelo, 5f, UnityEngine.AI.NavMesh.AllAreas))
+                agente.Warp(suelo.position);
+        }
+
         return zombie;
     }
 
