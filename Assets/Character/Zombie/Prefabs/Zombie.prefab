@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: 2408556397555086773}
   - component: {fileID: 592530179434425468}
   m_Layer: 8
-  m_Name: ZombieMale_AAB
+  m_Name: Zombie
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -177,7 +177,7 @@ MonoBehaviour:
   ojos: {fileID: 0}
   capasQueTapanLaVista:
     serializedVersion: 2
-    m_Bits: 4294967039
+    m_Bits: 567
   alturaDelObjetivo: 1.2
   velocidadVagar: 1.4
   velocidadPerseguir: 3.4
