@@ -27,11 +27,20 @@ public class ZombieController : MonoBehaviour, IDamageable
     private Transform player;
     private float nextAttackTime;
 
+    /// <summary>Cerebro de horda (ZombieBrain). Si existe, el se encarga de moverse y decidir.</summary>
+    private ZombieBrain cerebro;
+
     private enum State { Idle, Chase, Attack, Dead }
     private State currentState = State.Idle;
 
     /// <summary>Dinero que otorga al morir.</summary>
     public int Reward => reward;
+
+    /// <summary>Dano por golpe ya escalado por la ronda. Lo usa el cerebro de horda.</summary>
+    public float Dano => damage;
+
+    /// <summary>True cuando ya ha muerto.</summary>
+    public bool Muerto => currentState == State.Dead;
 
     /// <summary>Se dispara cuando muere cualquier zombie: lo escuchan RoundManager y GameManager.</summary>
     public static event Action<ZombieController> OnAnyZombieDied;
@@ -48,6 +57,7 @@ public class ZombieController : MonoBehaviour, IDamageable
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        cerebro = GetComponent<ZombieBrain>();
         currentHealth = maxHealth;
     }
 
@@ -58,6 +68,11 @@ public class ZombieController : MonoBehaviour, IDamageable
 
     private void Update()
     {
+        // Con un ZombieBrain en el objeto, el movimiento y las decisiones los lleva el
+        // cerebro de horda (con reparto de turnos y ranuras alrededor del jugador).
+        // Aqui quedan la vida, el dano recibido, la recompensa y la muerte.
+        if (cerebro != null) return;
+
         if (currentState == State.Dead) return;
         if (player == null) return;
 
