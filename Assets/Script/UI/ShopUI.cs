@@ -51,6 +51,9 @@ public class ShopUI : MonoBehaviour
     private FirstPersonController playerController;
     private float infoHideTime;
     private int gastado;
+    /// <summary>Open() ya se llamo al menos una vez. Si este objeto empieza inactivo en la
+    /// escena, su Start se ejecuta en el primer Open y no debe volver a ocultar el panel.</summary>
+    private bool abiertaAlgunaVez;
 
     private void Awake()
     {
@@ -59,8 +62,10 @@ public class ShopUI : MonoBehaviour
 
     private void Start()
     {
-        if (panel != null) panel.SetActive(false);
-        if (infoText != null) infoText.text = string.Empty;
+        // Si el primer Open() activo este objeto, Start llega DESPUES de abrir:
+        // ocultar el panel aqui cerraba la tienda nada mas abrirla.
+        if (panel != null && !abiertaAlgunaVez) panel.SetActive(false);
+        if (infoText != null && !abiertaAlgunaVez) infoText.text = string.Empty;
 
         // Las pestanas se cablean solas por indice.
         if (tabButtons != null)
@@ -91,6 +96,7 @@ public class ShopUI : MonoBehaviour
     {
         if (IsOpen) return;
 
+        abiertaAlgunaVez = true;
         CachePlayer();
         if (panel != null) panel.SetActive(true);
         IsAnyOpen = true;
