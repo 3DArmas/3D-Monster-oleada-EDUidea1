@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 757933503436870543}
   - component: {fileID: -9138736745395149745}
   - component: {fileID: 487933316167440255}
+  - component: {fileID: 7132587185862975875}
   m_Layer: 0
   m_Name: ZombieMale_AAB
   m_TagString: Untagged
@@ -149,6 +150,27 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 3
+--- !u!114 &7132587185862975875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1993608188771188032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a894558aa9ac7df478cdeabe920f4dfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ZombieGroundSnap
+  modelo: {fileID: 1681136528853134326}
+  plantaDelPie: 0.1
+  intervalo: 0.08
+  suavizado: 0.4
+  limiteLocal: 1.2
+  capasSuelo:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  margenApoyado: 0.12
 --- !u!1001 &1215446029693094941
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -200,23 +222,23 @@ PrefabInstance:
     - target: {fileID: -5602156011692487775, guid: 7850afb9a2f50ad418017a419774a6b7, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 39fe07ef676e1be46be0e79b071092f3, type: 2}
+      objectReference: {fileID: 2100000, guid: 0866ca2a82ed89c4ea45aa013944a187, type: 2}
     - target: {fileID: -5602156011692487775, guid: 7850afb9a2f50ad418017a419774a6b7, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: ff14b9db2e6b5d447a3ebb320e9e8913, type: 2}
+      objectReference: {fileID: 2100000, guid: f5537e04057a7b549a29bda982c31f86, type: 2}
     - target: {fileID: -1372682465251703209, guid: 7850afb9a2f50ad418017a419774a6b7, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 39fe07ef676e1be46be0e79b071092f3, type: 2}
+      objectReference: {fileID: 2100000, guid: 0866ca2a82ed89c4ea45aa013944a187, type: 2}
     - target: {fileID: -1372682465251703209, guid: 7850afb9a2f50ad418017a419774a6b7, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: ff14b9db2e6b5d447a3ebb320e9e8913, type: 2}
+      objectReference: {fileID: 2100000, guid: f5537e04057a7b549a29bda982c31f86, type: 2}
     - target: {fileID: -1372682465251703209, guid: 7850afb9a2f50ad418017a419774a6b7, type: 3}
       propertyPath: 'm_Materials.Array.data[2]'
       value: 
-      objectReference: {fileID: 2100000, guid: ff14b9db2e6b5d447a3ebb320e9e8913, type: 2}
+      objectReference: {fileID: 2100000, guid: f5537e04057a7b549a29bda982c31f86, type: 2}
     - target: {fileID: 919132149155446097, guid: 7850afb9a2f50ad418017a419774a6b7, type: 3}
       propertyPath: m_Name
       value: Modelo
@@ -224,11 +246,11 @@ PrefabInstance:
     - target: {fileID: 2946127283979886938, guid: 7850afb9a2f50ad418017a419774a6b7, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 39fe07ef676e1be46be0e79b071092f3, type: 2}
+      objectReference: {fileID: 2100000, guid: 0866ca2a82ed89c4ea45aa013944a187, type: 2}
     - target: {fileID: 2946127283979886938, guid: 7850afb9a2f50ad418017a419774a6b7, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
-      objectReference: {fileID: 2100000, guid: ff14b9db2e6b5d447a3ebb320e9e8913, type: 2}
+      objectReference: {fileID: 2100000, guid: f5537e04057a7b549a29bda982c31f86, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
