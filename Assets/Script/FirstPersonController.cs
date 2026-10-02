@@ -33,6 +33,13 @@ public class FirstPersonController : MonoBehaviour
     /// <summary>Sube la velocidad un porcentaje (1.08 = +8 %).</summary>
     public void MejorarVelocidad(float factor) { multiplicadorVelocidad *= factor; }
 
+    /// <summary>Sensibilidad del raton. La ajusta el menu de opciones.</summary>
+    public float Sensibilidad
+    {
+        get => mouseSensitivity;
+        set => mouseSensitivity = Mathf.Clamp(value, 0.02f, 1f);
+    }
+
     /// <summary>Sube la altura de salto un porcentaje.</summary>
     public void MejorarSalto(float factor) { multiplicadorSalto *= factor; }
 

@@ -77,8 +77,8 @@ public class ShopUI : MonoBehaviour
 
     private void Update()
     {
-        // ESC cierra la tienda (sin pasar de ronda).
-        if (IsOpen && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) Close();
+        // OJO: el ESC lo gestiona PauseMenu (que cierra la tienda antes de pausar),
+        // para que una sola tecla no haga dos cosas a la vez.
 
         if (infoText != null && infoText.text.Length > 0 && Time.time >= infoHideTime) infoText.text = string.Empty;
     }
