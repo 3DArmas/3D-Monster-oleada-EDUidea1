@@ -23,6 +23,19 @@ public class FirstPersonController : MonoBehaviour
     private float verticalVelocity;
     private float pitch;
 
+    // --- Multiplicadores que se compran en la tienda ---
+    private float multiplicadorVelocidad = 1f;
+    private float multiplicadorSalto = 1f;
+
+    public float VelocidadActual => walkSpeed * multiplicadorVelocidad;
+    public float AlturaSaltoActual => jumpHeight * multiplicadorSalto;
+
+    /// <summary>Sube la velocidad un porcentaje (1.08 = +8 %).</summary>
+    public void MejorarVelocidad(float factor) { multiplicadorVelocidad *= factor; }
+
+    /// <summary>Sube la altura de salto un porcentaje.</summary>
+    public void MejorarSalto(float factor) { multiplicadorSalto *= factor; }
+
     // Referencias a las Input Actions (asignadas desde el PlayerInput component)
     private InputAction moveAction;
     private InputAction lookAction;
@@ -74,15 +87,17 @@ public class FirstPersonController : MonoBehaviour
     {
         // Dirección relativa a hacia donde mira el jugador
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
-        controller.Move(move * walkSpeed * Time.deltaTime);
+        controller.Move(move * walkSpeed * multiplicadorVelocidad * Time.deltaTime);
 
         // Gravedad
         if (controller.isGrounded && verticalVelocity < 0)
             verticalVelocity = -2f; // pequeño valor para mantenerlo pegado al suelo
 
-        if (jumpAction != null && jumpAction.WasPressedThisFrame() && controller.isGrounded)
+        // Se usa IsPressed y no WasPressedThisFrame: asi el salto no se pierde si
+        // pulsas un instante antes de tocar el suelo, que era el fallo que notaba el jugador.
+        if (jumpAction != null && jumpAction.IsPressed() && controller.isGrounded)
         {
-            verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            verticalVelocity = Mathf.Sqrt(jumpHeight * multiplicadorSalto * -2f * gravity);
         }
 
         verticalVelocity += gravity * Time.deltaTime;
