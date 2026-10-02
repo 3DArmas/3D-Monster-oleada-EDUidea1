@@ -102,6 +102,19 @@ public static class ApocalypseUIApplier
     /// </summary>
     public static int Apply()
     {
+        // En Play mode no se puede marcar la escena como sucia: el restyle se aplicaria
+        // en memoria y se perderia al salir, obligando a repetir el menu una y otra vez.
+        // Mejor avisar en claro y no hacer nada.
+        if (Application.isPlaying)
+        {
+            Debug.LogError(Tag + "Estas en PLAY MODE. Para la reproduccion (boton Play), vuelve a lanzar el menu " +
+                                 "y guarda la escena con Ctrl+S. En Play los cambios se pierden al salir.");
+            EditorUtility.DisplayDialog("Apocalypse UI",
+                "Estas en PLAY MODE.\n\nPara la reproduccion con el boton Play, vuelve a lanzar el menu y guarda con Ctrl+S.\n\n" +
+                "En Play mode los cambios se pierden al salir de la reproduccion.", "Entendido");
+            return -1;
+        }
+
         Debug.Log(Tag + AssetSetupReport());
 
         var ctx = new Ctx
