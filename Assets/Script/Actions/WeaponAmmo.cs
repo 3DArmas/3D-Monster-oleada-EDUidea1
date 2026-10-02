@@ -158,6 +158,12 @@ public class WeaponAmmo : MonoBehaviour
         Notify();
     }
 
+    /// <summary>La tienda acorta el tiempo de recarga (0.75 = 25 % mas rapido).</summary>
+    public void MejorarRecarga(float factor)
+    {
+        reloadTime = Mathf.Max(0.2f, reloadTime * factor);
+    }
+
     private void PlaySound(AudioClip clip)
     {
         if (clip != null && audioSource != null) audioSource.PlayOneShot(clip);

@@ -37,6 +37,12 @@ public class Shot : MonoBehaviour
     private InputAction reloadAction;
     private float nextShotTime = 0f;
 
+    /// <summary>La tienda sube el dano de este arma (1.10 = +10 %).</summary>
+    public void MejorarDano(float factor)
+    {
+        damage *= factor;
+    }
+
     private void Awake()
     {
         PlayerInput playerInput = GetComponentInParent<PlayerInput>();
