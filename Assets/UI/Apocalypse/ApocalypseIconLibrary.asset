@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0af6e11be49cb714698600e818e717c5, type: 3}
+  m_Name: ApocalypseIconLibrary
+  m_EditorClassIdentifier: Assembly-CSharp::ApocalypseIconLibrary
+  items:
+  - key: salto
+    sprite: {fileID: 6350286489651913195, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: velocidad
+    sprite: {fileID: 8057751236465679128, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: doble_salto
+    sprite: {fileID: 2859307351219010450, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: dash
+    sprite: {fileID: -3598055455240613486, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: aguante
+    sprite: {fileID: -2606571271778472870, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: slide
+    sprite: {fileID: 1511817325605301589, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: wallrun
+    sprite: {fileID: 8730108876605719581, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: mantle
+    sprite: {fileID: 4400395243362048798, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: municion
+    sprite: {fileID: 6419589455393970794, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: municion_grande
+    sprite: {fileID: 884129478410301233, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: dano
+    sprite: {fileID: 4574530506628009669, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: recarga
+    sprite: {fileID: 6954749875228153678, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: cargador
+    sprite: {fileID: -740344170023211305, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: botiquin
+    sprite: {fileID: -6944603799074707484, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: vida
+    sprite: {fileID: -2034222885448066106, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: granada
+    sprite: {fileID: -4018749747175485755, guid: 0a3e1d7b3bb1e4e42befd6b996f2dff7, type: 3}
+  - key: escopeta
+    sprite: {fileID: -6067454432794230718, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: subfusil
+    sprite: {fileID: -2782891161502188905, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: rifle
+    sprite: {fileID: 4930739452924808194, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: mina
+    sprite: {fileID: 4010472007178325338, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  categories:
+  - key: armas
+    sprite: {fileID: -8949119505089634058, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: municion
+    sprite: {fileID: 1630598369702281207, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: movilidad
+    sprite: {fileID: -2815894205721462791, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: combate
+    sprite: {fileID: -25974018217793028, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: objetos
+    sprite: {fileID: -1601985646620827544, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  weapons:
+  - key: m1911|pistola|pistol
+    sprite: {fileID: -8949119505089634058, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: ak74|ak47|ak-47|ak
+    sprite: {fileID: -2963664838828514387, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: cuchillo|knife|navaja
+    sprite: {fileID: 7043723609123342314, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: escopeta|shotgun
+    sprite: {fileID: -6067454432794230718, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: subfusil|smg
+    sprite: {fileID: -2782891161502188905, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: rifle|francotirador|sniper
+    sprite: {fileID: 4930739452924808194, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  hud:
+  - key: bullet
+    sprite: {fileID: 9080314477266153992, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: skull
+    sprite: {fileID: -4492317406128875019, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: health
+    sprite: {fileID: 71633012903916526, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: crosshair
+    sprite: {fileID: -465296594253615874, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
+  - key: lock
+    sprite: {fileID: -5318550558197731339, guid: c71dfe0755ffe134d8c2d6bdb92bf590, type: 3}
