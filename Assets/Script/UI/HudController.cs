@@ -24,7 +24,6 @@ public class HudController : MonoBehaviour
     [SerializeField] private GameManager gameManager;
 
     [Header("Ajustes")]
-    [SerializeField] private float messageDuration = 2.5f;
     [SerializeField] private Color healthGood = new Color(0.45f, 0.95f, 0.5f);
     [SerializeField] private Color healthLow = new Color(1f, 0.35f, 0.3f);
 
