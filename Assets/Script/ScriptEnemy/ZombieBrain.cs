@@ -54,10 +54,10 @@ public class ZombieBrain : MonoBehaviour
     [SerializeField] private LayerMask capaDeZombis;
 
     [Header("Anti-atasco")]
-    [Tooltip("Si no avanza nada durante este tiempo, intenta desatascarse.")]
-    [SerializeField] private float tiempoParaConsiderarAtascado = 1.2f;
-    [Tooltip("Movimiento por debajo del cual se considera que está clavado.")]
-    [SerializeField] private float avanceMinimo = 0.25f;
+    [Tooltip("Ventana de tiempo (segundos) en la que se mide si el zombi se ha movido.")]
+    [SerializeField] private float ventanaDeAtasco = 1.2f;
+    [Tooltip("Distancia mínima que debe recorrer en esa ventana para no considerarse atascado.")]
+    [SerializeField] private float distanciaMinimaEnVentana = 0.35f;
 
     [Header("Vagar (cuando no hay alerta)")]
     [SerializeField] private float radioDeVagar = 12f;
@@ -85,8 +85,26 @@ public class ZombieBrain : MonoBehaviour
     private float siguienteAtaque;
     private float siguientePaseo;
     private Vector3 posicionAnterior;
-    private float tiempoQuieto;
     private bool alertado;
+
+    // --- Control de tiempos (imprescindible para que no vayan "a lo loco") ---
+    [Header("Ritmo de pensamiento")]
+    [Tooltip("Cada cuánto piensa este zombi como máximo (segundos). El director reparte los turnos encima de esto.")]
+    [SerializeField] private float intervaloDePensamiento = 0.2f;
+
+    private float siguientePensamiento;
+    private float inicioDeVentana;
+    private float distanciaAcumulada;
+
+    // Empujes suaves: se calculan cada cierto tiempo pero se APLICAN cada frame
+    // multiplicados por Time.deltaTime (si no, el movimiento depende de los FPS).
+    private Vector3 empujeSeparacion;
+    private Vector3 empujeExtra;
+    private float empujeExtraHasta;
+    [Tooltip("Fuerza del empujón de desatasco (m/s).")]
+    [SerializeField] private float fuerzaDeDesatasco = 1.6f;
+    [Tooltip("Cuánto dura el empujón de desatasco.")]
+    [SerializeField] private float duracionDelDesatasco = 0.45f;
 
     private static readonly Collider[] vecinos = new Collider[16];
 
@@ -102,6 +120,9 @@ public class ZombieBrain : MonoBehaviour
         animador = GetComponent<Animator>();
         origen = transform.position;
         posicionAnterior = transform.position;
+        inicioDeVentana = Time.time;
+        // Desfase aleatorio: así los zombis no piensan todos en el mismo frame.
+        siguientePensamiento = Time.time + Random.Range(0f, intervaloDePensamiento);
 
         if (ojos == null)
         {
@@ -169,38 +190,57 @@ public class ZombieBrain : MonoBehaviour
 
     private bool AgenteListo => agente != null && agente.enabled && agente.isOnNavMesh;
 
-    /// <summary>Aparta suavemente al zombi de sus compañeros para que no se solapen.</summary>
+    /// <summary>
+    /// Aparta suavemente al zombi de sus compañeros.
+    /// El cálculo de vecinos (que es lo caro) se hace cada cierto intervalo, pero el
+    /// empuje se APLICA cada frame multiplicado por deltaTime: así el movimiento es
+    /// fluido y no depende de los FPS. Antes se aplicaba un salto de golpe cada 0,12 s
+    /// y se veía como un tirón lateral.
+    /// </summary>
     private void AplicarSeparacion()
     {
-        if (Time.time < siguienteSeparacion) return;
-        siguienteSeparacion = Time.time + cadaSeparacion;
-
-        int n = Physics.OverlapSphereNonAlloc(transform.position, radioDeSeparacion, vecinos, capaDeZombis);
-        Vector3 empuje = Vector3.zero;
-        for (int i = 0; i < n; i++)
+        // 1) Recalcular la dirección del empuje cada cierto intervalo
+        if (Time.time >= siguienteSeparacion)
         {
-            Collider otro = vecinos[i];
-            if (otro == null) continue;
-            if (otro.transform.root == transform.root) continue;
+            siguienteSeparacion = Time.time + cadaSeparacion;
 
-            Vector3 diferencia = transform.position - otro.transform.position;
-            diferencia.y = 0f;
-            float distancia = diferencia.magnitude;
-            if (distancia < 0.01f)
+            int n = Physics.OverlapSphereNonAlloc(transform.position, radioDeSeparacion, vecinos, capaDeZombis);
+            Vector3 empuje = Vector3.zero;
+            for (int i = 0; i < n; i++)
             {
-                // Justo encima: se aparta en una dirección aleatoria estable.
-                diferencia = new Vector3(Random.value - 0.5f, 0f, Random.value - 0.5f);
-                distancia = 0.01f;
+                Collider otro = vecinos[i];
+                if (otro == null) continue;
+                if (otro.transform.root == transform.root) continue;
+
+                Vector3 diferencia = transform.position - otro.transform.position;
+                diferencia.y = 0f;
+                float distancia = diferencia.magnitude;
+                if (distancia < 0.01f)
+                {
+                    // Justo encima: se aparta en una dirección aleatoria.
+                    diferencia = new Vector3(Random.value - 0.5f, 0f, Random.value - 0.5f);
+                    distancia = 0.01f;
+                }
+                if (distancia < radioDeSeparacion)
+                    empuje += diferencia.normalized * (1f - distancia / radioDeSeparacion);
             }
-            if (distancia < radioDeSeparacion)
-                empuje += diferencia.normalized * (1f - distancia / radioDeSeparacion);
+            empujeSeparacion = empuje.sqrMagnitude > 0.0001f ? empuje.normalized : Vector3.zero;
         }
 
-        if (empuje.sqrMagnitude > 0.0001f)
+        // 2) Aplicarlo CADA frame, escalado por el tiempo real
+        Vector3 total = empujeSeparacion * fuerzaDeSeparacion;
+
+        // Atacando se aparta menos: si no, temblaría alrededor del jugador.
+        if (estado == Estado.Atacar) total *= 0.35f;
+
+        // Empujón de desatasco (dura unas décimas y se apaga solo)
+        if (Time.time < empujeExtraHasta) total += empujeExtra;
+        else empujeExtra = Vector3.zero;
+
+        if (total.sqrMagnitude > 0.0001f)
         {
             // Move respeta el NavMesh: no los saca del suelo ni atraviesa paredes.
-            Vector3 desplazamiento = empuje.normalized * fuerzaDeSeparacion * cadaSeparacion;
-            agente.Move(desplazamiento);
+            agente.Move(total * Time.deltaTime);
         }
     }
 
@@ -230,6 +270,12 @@ public class ZombieBrain : MonoBehaviour
     public void TickLento()
     {
         if (estado == Estado.Muerto) return;
+
+        // Ritmo de pensamiento limitado POR RELOJ (no por número de ticks). Sin esto,
+        // con muchos zombis cada cerebro pensaba decenas de veces por segundo y el
+        // detector de atascos se disparaba sin parar: el zombi iba a los lados.
+        if (Time.time < siguientePensamiento) return;
+        siguientePensamiento = Time.time + intervaloDePensamiento * Random.Range(0.85f, 1.15f);
 
         // Auto-reparación: si no está registrado en el director (por una recarga de
         // dominio, por ejemplo), se registra aquí. Así nunca se queda "sin cerebro".
@@ -335,7 +381,6 @@ public class ZombieBrain : MonoBehaviour
     private void Atacar(float distancia)
     {
         agente.isStopped = true;
-        agente.velocity = Vector3.zero;
         if (Time.time < siguienteAtaque) return;
         siguienteAtaque = Time.time + 1f / Mathf.Max(0.05f, cadenciaDeAtaque);
 
@@ -395,25 +440,26 @@ public class ZombieBrain : MonoBehaviour
 
     private void ComprobarAtasco()
     {
-        float avance = Vector3.Distance(transform.position, posicionAnterior);
+        float ahora = Time.time;
+
+        // Se acumula lo que ha recorrido desde el tick anterior...
+        distanciaAcumulada += Vector3.Distance(transform.position, posicionAnterior);
         posicionAnterior = transform.position;
 
-        bool deberiaMoverse = estado != Estado.Atacar && !agente.isStopped && agente.hasPath;
-        if (deberiaMoverse && avance < avanceMinimo)
-        {
-            tiempoQuieto += cadaRecalculoDeRuta;
-            if (tiempoQuieto >= tiempoParaConsiderarAtascado)
-            {
-                Desatascar();
-                tiempoQuieto = 0f;
-            }
-        }
-        else tiempoQuieto = 0f;
+        // ...y cada ventana de tiempo REAL se decide si está clavado.
+        if (ahora - inicioDeVentana < ventanaDeAtasco) return;
+        inicioDeVentana = ahora;
+
+        bool deberiaMoverse = estado != Estado.Atacar && !agente.isStopped;
+        if (deberiaMoverse && distanciaAcumulada < distanciaMinimaEnVentana) Desatascar();
+        distanciaAcumulada = 0f;
     }
 
     /// <summary>
     /// Se ha quedado clavado (esquina, montón de zombis, hueco estrecho). Se rompe el
-    /// bloqueo: nueva prioridad de evitación, ruta limpia y un empujoncito a un lado.
+    /// bloqueo: nueva prioridad de evitación, ruta limpia y un empujón a un lado que se
+    /// aplica de forma suave durante unas décimas (antes era un salto instantáneo de
+    /// medio metro, y se veía como un tirón).
     /// </summary>
     private void Desatascar()
     {
@@ -422,10 +468,12 @@ public class ZombieBrain : MonoBehaviour
 
         Vector3 lado = Random.value < 0.5f ? transform.right : -transform.right;
         if (Random.value < 0.35f) lado = -transform.forward;
-        agente.Move(lado.normalized * 0.5f);
 
-        // Y busca un punto de NavMesh cercano para retomar desde ahí.
-        if (NavMesh.SamplePosition(transform.position + lado * 1.2f, out NavMeshHit golpe, 3f, NavMesh.AllAreas))
+        empujeExtra = lado.normalized * fuerzaDeDesatasco;
+        empujeExtraHasta = Time.time + duracionDelDesatasco;
+
+        // Retoma desde un punto cercano del NavMesh.
+        if (NavMesh.SamplePosition(transform.position + lado * 1.0f, out NavMeshHit golpe, 3f, NavMesh.AllAreas))
         {
             agente.SetDestination(golpe.position);
             ultimoDestino = golpe.position;
