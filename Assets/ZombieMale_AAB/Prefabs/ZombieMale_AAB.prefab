@@ -11,13 +11,13 @@ GameObject:
   - component: {fileID: 1216368519549315066}
   - component: {fileID: 5044388296177335680}
   - component: {fileID: 4185594555157654890}
-  - component: {fileID: 757933503436870543}
   - component: {fileID: -9138736745395149745}
   - component: {fileID: 487933316167440255}
   - component: {fileID: 7132587185862975875}
   - component: {fileID: 1330562832026387989}
   - component: {fileID: 5086636404934626764}
   - component: {fileID: 2408556397555086773}
+  - component: {fileID: 592530179434425468}
   m_Layer: 8
   m_Name: ZombieMale_AAB
   m_TagString: Untagged
@@ -83,27 +83,8 @@ MonoBehaviour:
   patrolSpeed: 1.5
   chaseSpeed: 3.5
   reward: 100
---- !u!65 &757933503436870543
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1993608188771188032}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.80985755, y: 2.0550904, z: 0.91317976}
-  m_Center: {x: 0, y: 1.0275452, z: 0}
+  multiplicadorCabeza: 2.5
+  radioCabeza: 0.15
 --- !u!195 &-9138736745395149745
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -113,7 +94,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 1993608188771188032}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.46277577
+  m_Radius: 0.42
   m_Speed: 3.5
   m_Acceleration: 16
   avoidancePriority: 50
@@ -343,6 +324,29 @@ MonoBehaviour:
   tonoAleatorio: {x: 0.85, y: 1.15}
   volumen: 0.6
   cadaCuantoGrune: {x: 4, y: 9}
+--- !u!136 &592530179434425468
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1993608188771188032}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.42
+  m_Height: 1.2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.63, z: 0}
 --- !u!1001 &1215446029693094941
 PrefabInstance:
   m_ObjectHideFlags: 0

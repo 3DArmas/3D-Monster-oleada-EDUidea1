@@ -21,6 +21,11 @@ public class ZombieController : MonoBehaviour, IDamageable
     [Tooltip("Dinero que suelta al morir (GDD: normal 100, rapido 150, trepador 175, tanque 300, mini boss 1000).")]
     [SerializeField] private int reward = 100;
 
+    [Header("Zonas de golpe")]
+    [Tooltip("Multiplicador de dano al disparar a la CABEZA (2.5 = casi el triple).")]
+    [SerializeField] private float multiplicadorCabeza = 2.5f;
+    [Tooltip("Radio del collider de la cabeza.")]
+    [SerializeField] private float radioCabeza = 0.15f;
     private float currentHealth;
     private NavMeshAgent agent;
     private Animator animator;
@@ -62,6 +67,42 @@ public class ZombieController : MonoBehaviour, IDamageable
         animator = GetComponent<Animator>();
         cerebro = GetComponent<ZombieBrain>();
         currentHealth = maxHealth;
+        CrearZonasDeGolpe();
+    }
+
+    /// <summary>
+    /// Crea las ZONAS DE GOLPE sobre los huesos: cabeza (x2.5, headshots) y torso (x1).
+    ///
+    /// Por que hace falta el torso: la capsula del cuerpo se queda corta a proposito
+    /// (cadera y piernas) para que la cabeza quede por FUERA y se pueda acertar. Sin una
+    /// zona en el pecho, los disparos al tronco no tocarian nada. Las zonas van pegadas a
+    /// los huesos, asi que siguen a la animacion (el zombi agacha la cabeza al andar).
+    ///
+    /// Todo se crea por codigo para no tocar la jerarquia del modelo importado: asi
+    /// sobrevive a cualquier reimportacion del FBX.
+    /// </summary>
+    private void CrearZonasDeGolpe()
+    {
+        if (animator == null || !animator.isHuman) return;
+
+        CrearZona(animator.GetBoneTransform(HumanBodyBones.Head), radioCabeza, new Vector3(0f, 0.10f, 0f), multiplicadorCabeza, "CABEZA");
+        CrearZona(animator.GetBoneTransform(HumanBodyBones.Spine), 0.32f, new Vector3(0f, 0.10f, 0f), 1f, "TORSO");
+    }
+
+    private void CrearZona(Transform hueso, float radio, Vector3 desplazamiento, float multiplicador, string etiqueta)
+    {
+        if (hueso == null || hueso.Find("Zona" + etiqueta) != null) return;
+
+        var go = new GameObject("Zona" + etiqueta);
+        go.layer = gameObject.layer;
+        go.transform.SetParent(hueso, false);
+        go.transform.localPosition = desplazamiento;
+
+        var esfera = go.AddComponent<SphereCollider>();
+        esfera.radius = radio;
+        esfera.isTrigger = false;   // la bala es fisica (OnCollisionEnter): necesita colision real
+
+        go.AddComponent<ZonaDeGolpe>().Configurar(multiplicador, etiqueta);
     }
 
     private void Start()

@@ -27,11 +27,13 @@ public class Bullet : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        HandleHit(collision.collider);
+        HandleHit(collision);
     }
 
-    private void HandleHit(Collider other)
+    private void HandleHit(Collision collision)
     {
+        Collider other = collision.collider;
+
         // Una bala hace dano UNA sola vez (Destroy tarda hasta el final del frame).
         if (hasHit || other == null) return;
 
@@ -40,8 +42,22 @@ public class Bullet : MonoBehaviour
 
         hasHit = true;
 
+        // ZONA DE GOLPE: si le has dado a la cabeza (o a una extremidad), el dano se
+        // multiplica. El multiplicador lo pone el componente ZonaDeGolpe.
+        float multiplicador = 1f;
+        ZonaDeGolpe zona = other.GetComponent<ZonaDeGolpe>();
+        if (zona == null) zona = other.GetComponentInParent<ZonaDeGolpe>();
+        if (zona != null) multiplicador = zona.Multiplicador;
+
         IDamageable target = other.GetComponentInParent<IDamageable>();
-        if (target != null) target.TakeDamage(damage);
+        if (target != null) target.TakeDamage(damage * multiplicador);
+
+        // SANGRE justo en el punto del impacto, saliendo hacia fuera. Solo los zombis sangran.
+        if (other.GetComponentInParent<ZombieController>() != null && collision.contactCount > 0)
+        {
+            ContactPoint contacto = collision.GetContact(0);
+            SangreDeZombi.Salpicar(contacto.point, contacto.normal);
+        }
 
         Destroy(gameObject);
     }
