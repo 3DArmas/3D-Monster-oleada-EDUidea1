@@ -35,6 +35,10 @@ public class ShopInteractable : MonoBehaviour
     private InputAction fireAction;
     private bool visible;
     private bool aiming;
+    /// <summary>Hay que soltar el boton antes de poder volver a abrir. Si no, con el
+    /// clic mantenido la tienda se reabria sola justo despues de cerrarla.</summary>
+    private bool esperandoSoltar;
+    private bool estabaAbierta;
 
     private void Awake()
     {
@@ -62,6 +66,11 @@ public class ShopInteractable : MonoBehaviour
 
     private void Update()
     {
+        // Si la tienda se acaba de cerrar, exigir soltar el boton antes de reabrirla.
+        bool abiertaAhora = shopUI != null && shopUI.IsOpen;
+        if (estabaAbierta && !abiertaAhora) esperandoSoltar = true;
+        estabaAbierta = abiertaAhora;
+
         if (!visible)
         {
             aiming = false;
@@ -80,6 +89,15 @@ public class ShopInteractable : MonoBehaviour
         if (!aiming) return;
 
         if (hud != null) hud.ShowMessage("PULSA  [E]  O  CLIC  PARA ABRIR LA TIENDA", 0.2f);
+
+        // Si acaba de abrir o cerrar, hay que soltar el boton antes de poder abrir otra vez.
+        if (esperandoSoltar)
+        {
+            bool suelto = (interactAction == null || !interactAction.IsPressed())
+                       && (fireAction == null || !fireAction.IsPressed());
+            if (suelto) esperandoSoltar = false;
+            return;
+        }
 
         // Abrir con E o con clic (el mismo boton que dispara). Se usa IsPressed y no
         // WasPressedThisFrame: asi basta con mantener pulsado y no depende de que la
@@ -105,6 +123,7 @@ public class ShopInteractable : MonoBehaviour
     {
         if (shopUI == null) return;
         shopUI.Open();
+        esperandoSoltar = true;
         PointerOnShop = false;
     }
 
