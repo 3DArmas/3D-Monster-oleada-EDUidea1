@@ -53,6 +53,14 @@ public class FirstPersonController : MonoBehaviour
         if (controller == null)
             controller = GetComponent<CharacterController>();
 
+        // El pitch de la mirada parte de la rotacion que tenga la camara colocada
+        // en la escena (asi no hay saltos raros al empezar la partida).
+        if (cameraHolder != null)
+        {
+            pitch = cameraHolder.localEulerAngles.x;
+            if (pitch > 180f) pitch -= 360f;
+        }
+
         PlayerInput playerInput = GetComponent<PlayerInput>();
         moveAction = playerInput.actions["Move"];
         lookAction = playerInput.actions["Look"];
@@ -80,12 +88,27 @@ public class FirstPersonController : MonoBehaviour
 
     private void HandleLook()
     {
+        // PROTECCIONES CONTRA PICOS DE LA MIRADA.
+        // Esto era lo que dejaba la camara mirando al suelo al empezar: en el primer
+        // frame llegaba un delta enorme (ventana sin foco, alt-tab, raton saltando) y
+        // se aplicaba tal cual: 42 grados de golpe, y ahi se quedaba.
+
+        // 1) Si el juego no tiene el foco, no se mira.
+        if (!Application.isFocused) return;
+
+        // 2) Con el cursor suelto (tienda, pausa, game over) tampoco se mira.
+        if (Cursor.lockState != CursorLockMode.Locked) return;
+
+        // 3) Se limita el delta por frame: los saltos absurdos se recortan, pero un
+        //    giro rapido de verdad (hasta 60 unidades) se respeta entero.
+        Vector2 mirada = Vector2.ClampMagnitude(lookInput, 60f);
+
         // Rotación horizontal (yaw) rota todo el cuerpo del jugador
-        float yaw = lookInput.x * mouseSensitivity;
+        float yaw = mirada.x * mouseSensitivity;
         transform.Rotate(Vector3.up * yaw);
 
         // Rotación vertical (pitch) solo rota la cámara
-        pitch -= lookInput.y * mouseSensitivity;
+        pitch -= mirada.y * mouseSensitivity;
         pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
         cameraHolder.localRotation = Quaternion.Euler(pitch, 0f, 0f);
     }

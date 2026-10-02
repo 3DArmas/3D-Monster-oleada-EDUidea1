@@ -46,12 +46,27 @@ public class ZombieBrain : MonoBehaviour
     [Tooltip("Si el destino se movió más que esto, se recalcula aunque no toque.")]
     [SerializeField] private float movimientoMinimoParaRecalcular = 0.8f;
 
-    [Header("Evasion entre zombis")]
-    [Tooltip("A qué distancia empieza a apartarse de sus compañeros.")]
-    [SerializeField] private float radioDeSeparacion = 1.4f;
-    [SerializeField] private float fuerzaDeSeparacion = 2.6f;
+    [Header("Anti-solape (sin deslizarse)")]
+    [Tooltip("Distancia mínima entre zombis: SOLO evita que dos ocupen el mismo sitio. " +
+             "No los hace deslizarse a los lados: se aprietan y se empujan de frente, como una manda.")]
+    [SerializeField] private float radioDeSeparacion = 0.8f;
+    [Tooltip("Fuerza del tope anti-solape. Baja a propósito: es un tope, no un baile.")]
+    [SerializeField] private float fuerzaDeSeparacion = 1.1f;
     [SerializeField] private float cadaSeparacion = 0.12f;
     [SerializeField] private LayerMask capaDeZombis;
+
+    [Header("Ataque con la mano")]
+    [Tooltip("Radio del collider de la mano que golpea.")]
+    [SerializeField] private float radioDelGolpe = 0.34f;
+    [Tooltip("Fracción de la animación de ataque donde el golpe puede conectar (0 = inicio, 1 = fin).")]
+    [Range(0f, 1f)][SerializeField] private float impactoDesde = 0.3f;
+    [Range(0f, 1f)][SerializeField] private float impactoHasta = 0.55f;
+
+    [Header("Reacción al daño (flinch)")]
+    [Tooltip("Cuánto se queda sacudido al recibir un disparo.")]
+    [SerializeField] private float duracionDelFlinch = 0.35f;
+    [Tooltip("Empujón hacia atrás al recibir el disparo (m/s).")]
+    [SerializeField] private float fuerzaDelFlinch = 1.4f;
 
     [Header("Anti-atasco")]
     [Tooltip("Ventana de tiempo (segundos) en la que se mide si el zombi se ha movido.")]
@@ -101,10 +116,10 @@ public class ZombieBrain : MonoBehaviour
     private Vector3 empujeSeparacion;
     private Vector3 empujeExtra;
     private float empujeExtraHasta;
-    [Tooltip("Fuerza del empujón de desatasco (m/s).")]
-    [SerializeField] private float fuerzaDeDesatasco = 1.6f;
-    [Tooltip("Cuánto dura el empujón de desatasco.")]
-    [SerializeField] private float duracionDelDesatasco = 0.45f;
+    private float aturdidoHasta;
+    private Transform manoDeGolpe;
+    private SphereCollider colliderDeMano;
+    private bool golpeAplicado;
 
     private static readonly Collider[] vecinos = new Collider[16];
 
@@ -150,6 +165,25 @@ public class ZombieBrain : MonoBehaviour
             agente.autoBraking = true;
             agente.obstacleAvoidanceType = ObstacleAvoidanceType.GoodQualityObstacleAvoidance;
         }
+
+        // Collider del golpe: una esfera en el hueso de la mano. Se queda creado pero
+        // DESACTIVADO, y solo se enciende dentro de la ventana de impacto de la animación:
+        // así el daño llega cuando el brazo llega de verdad (y se puede esquivar).
+        if (animador != null && animador.isHuman)
+        {
+            Transform mano = animador.GetBoneTransform(HumanBodyBones.RightHand);
+            if (mano != null)
+            {
+                manoDeGolpe = mano;
+                GameObject nodo = new GameObject("GolpeMano");
+                nodo.transform.SetParent(mano, false);
+                colliderDeMano = nodo.AddComponent<SphereCollider>();
+                colliderDeMano.isTrigger = true;
+                colliderDeMano.radius = radioDelGolpe;
+                colliderDeMano.enabled = false;
+            }
+        }
+        if (controlador != null) controlador.OnDamaged += AlRecibirDano;
     }
 
     private void OnEnable()
@@ -159,6 +193,7 @@ public class ZombieBrain : MonoBehaviour
 
     private void OnDisable()
     {
+        if (controlador != null) controlador.OnDamaged -= AlRecibirDano;
         if (HordeDirector.Instancia != null) HordeDirector.Instancia.Desregistrar(this);
     }
 
@@ -185,6 +220,7 @@ public class ZombieBrain : MonoBehaviour
 
         AplicarSeparacion();
         EncararSiAtaca();
+        if (estado == Estado.Atacar) ComprobarGolpe();
         ActualizarAnimador();
     }
 
@@ -283,6 +319,13 @@ public class ZombieBrain : MonoBehaviour
             HordeDirector.Instancia.Registrar(this);
 
         if (controlador != null && controlador.Muerto) { Morir(); return; }
+
+        // Flinch: al recibir un disparo se queda sacudido un momento (y retrocede un poco).
+        if (Time.time < aturdidoHasta)
+        {
+            agente.isStopped = true;
+            return;
+        }
         if (!AgenteListo) return;
         if (jugador == null && HordeDirector.Instancia != null) jugador = HordeDirector.Instancia.Jugador;
         if (jugador == null) return;
@@ -378,16 +421,21 @@ public class ZombieBrain : MonoBehaviour
         IrA(destino, velocidadPerseguir);
     }
 
+    /// <summary>
+    /// El zombi ataca: se para, gira hacia el jugador y marca el inicio de un golpe.
+    /// El daño NO se aplica aquí: lo aplica el collider de la mano (ComprobarGolpe)
+    /// solo dentro de la ventana de impacto de la animación. Así, si te apartas, falla.
+    /// </summary>
     private void Atacar(float distancia)
     {
-        agente.isStopped = true;
+        // IMPORTANTE: sigue arrimándose MIENTRAS ataca. Si se parase a 2 m, el brazo no
+        // llegaría nunca al jugador y el golpe fallaría siempre (era el caso).
+        if (HordeDirector.Instancia != null) IrA(HordeDirector.Instancia.RanuraPara(this), velocidadPerseguir);
+        else agente.isStopped = true;
+
         if (Time.time < siguienteAtaque) return;
         siguienteAtaque = Time.time + 1f / Mathf.Max(0.05f, cadenciaDeAtaque);
-
-        IDamageable objetivo = jugador.GetComponent<IDamageable>();
-        if (objetivo == null) objetivo = jugador.GetComponentInParent<IDamageable>();
-        float valor = (usarDanoDelControlador && controlador != null) ? controlador.Dano : dano;
-        objetivo?.TakeDamage(valor);
+        golpeAplicado = false;
     }
 
     private void Buscar()
@@ -463,17 +511,17 @@ public class ZombieBrain : MonoBehaviour
     /// </summary>
     private void Desatascar()
     {
+        // Se rompe el bloqueo SIN apartarse a los lados (eso era el "esquivar"):
+        // nueva prioridad de evitación, ruta limpia y se replantea el destino.
         agente.avoidancePriority = Random.Range(20, 80);
         agente.ResetPath();
 
-        Vector3 lado = Random.value < 0.5f ? transform.right : -transform.right;
-        if (Random.value < 0.35f) lado = -transform.forward;
+        Vector3 hacia = ultimoDestino - transform.position;
+        hacia.y = 0f;
+        if (hacia.sqrMagnitude < 0.01f) hacia = transform.forward;
 
-        empujeExtra = lado.normalized * fuerzaDeDesatasco;
-        empujeExtraHasta = Time.time + duracionDelDesatasco;
-
-        // Retoma desde un punto cercano del NavMesh.
-        if (NavMesh.SamplePosition(transform.position + lado * 1.0f, out NavMeshHit golpe, 3f, NavMesh.AllAreas))
+        Vector3 candidato = transform.position + hacia.normalized * 1.0f;
+        if (NavMesh.SamplePosition(candidato, out NavMeshHit golpe, 3f, NavMesh.AllAreas))
         {
             agente.SetDestination(golpe.position);
             ultimoDestino = golpe.position;
@@ -482,6 +530,83 @@ public class ZombieBrain : MonoBehaviour
     }
 
     // ------------------------------------------------------------------
+
+    /// <summary>
+    /// Comprueba si el golpe del brazo conecta con el jugador. Solo cuenta DENTRO de la
+    /// ventana de impacto de la animación (el brazo tiene que llegar de verdad) y como
+    /// mucho UNA vez por golpe. Si el jugador se aparta, no recibe daño.
+    /// </summary>
+    private void ComprobarGolpe()
+    {
+        if (jugador == null) return;
+
+        // ¿Por qué punto del golpe va la animación?
+        float t = 0f;
+        if (animador != null && animador.runtimeAnimatorController != null)
+        {
+            AnimatorStateInfo info = animador.GetCurrentAnimatorStateInfo(0);
+            if (!info.IsName("Attack"))
+            {
+                if (colliderDeMano != null) colliderDeMano.enabled = false;
+                return;
+            }
+            t = Mathf.Repeat(info.normalizedTime, 1f);
+        }
+
+        bool enVentana = t >= impactoDesde && t <= impactoHasta;
+
+        // El collider de la mano solo está activo durante la ventana de impacto.
+        if (colliderDeMano != null) colliderDeMano.enabled = enVentana;
+
+        // Antes de la ventana se vuelve a "armar": un golpe por swing.
+        if (!enVentana)
+        {
+            if (t < impactoDesde) golpeAplicado = false;
+            return;
+        }
+        if (golpeAplicado) return;
+
+        // ¿Toca al jugador? Se comprueba la FÍSICA desde la mano, no la distancia.
+        Vector3 centro = manoDeGolpe != null ? manoDeGolpe.position : transform.position + Vector3.up * 1.2f;
+        Collider[] tocados = Physics.OverlapSphere(centro, radioDelGolpe, ~0, QueryTriggerInteraction.Ignore);
+        foreach (Collider tocado in tocados)
+        {
+            if (tocado == null) continue;
+            if (tocado.GetComponentInParent<PlayerHealth>() == null) continue;
+
+            IDamageable objetivo = tocado.GetComponentInParent<IDamageable>();
+            if (objetivo == null) continue;
+
+            float valor = (usarDanoDelControlador && controlador != null) ? controlador.Dano : dano;
+            objetivo.TakeDamage(valor);
+            golpeAplicado = true;
+            if (colliderDeMano != null) colliderDeMano.enabled = false;
+            return;
+        }
+    }
+
+    /// <summary>Al recibir un disparo se sacude y retrocede un poco (flinch).</summary>
+    private void AlRecibirDano(ZombieController quien, float cantidad)
+    {
+        if (estado == Estado.Muerto) return;
+        aturdidoHasta = Time.time + duracionDelFlinch;
+        empujeExtra = -transform.forward * fuerzaDelFlinch;
+        empujeExtraHasta = Time.time + duracionDelFlinch;
+    }
+
+    /// <summary>
+    /// Gira la cabeza hacia el jugador. Necesita que la capa del AnimatorController
+    /// tenga marcado "IK Pass"; si no, Unity no llama a este método.
+    /// </summary>
+    private void OnAnimatorIK(int layerIndex)
+    {
+        if (animador == null || jugador == null) return;
+        if (estado == Estado.Muerto) { animador.SetLookAtWeight(0f); return; }
+
+        float peso = estado == Estado.Vagar ? 0.35f : 1f;
+        animador.SetLookAtWeight(peso, 0f, 1f, 0f, 0.65f);
+        animador.SetLookAtPosition(jugador.position + Vector3.up * alturaDelObjetivo);
+    }
 
     private void Morir()
     {

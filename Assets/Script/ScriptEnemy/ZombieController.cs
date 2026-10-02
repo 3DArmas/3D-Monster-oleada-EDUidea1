@@ -45,6 +45,9 @@ public class ZombieController : MonoBehaviour, IDamageable
     /// <summary>Se dispara cuando muere cualquier zombie: lo escuchan RoundManager y GameManager.</summary>
     public static event Action<ZombieController> OnAnyZombieDied;
 
+    /// <summary>Se dispara cuando ESTE zombie recibe dano. Lo usa el cerebro para reaccionar (flinch).</summary>
+    public event Action<ZombieController, float> OnDamaged;
+
     /// <summary>Aplica el escalado de dificultad de la ronda. Lo llama RoundManager al instanciarlo.</summary>
     public void ApplyScaling(float healthMultiplier, float damageMultiplier)
     {
@@ -151,6 +154,7 @@ public class ZombieController : MonoBehaviour, IDamageable
         if (currentState == State.Dead) return;
 
         currentHealth -= amount;
+        OnDamaged?.Invoke(this, amount);
         if (currentHealth <= 0f)
         {
             Die();
