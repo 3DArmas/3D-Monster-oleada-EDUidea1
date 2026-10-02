@@ -138,6 +138,7 @@ public class ZombieBrain : MonoBehaviour
     private Transform manoDeGolpe;
     private SphereCollider colliderDeMano;
     private bool golpeAplicado;
+    private ZombieAudio audioZombi;
 
     private static readonly Collider[] vecinos = new Collider[16];
 
@@ -202,6 +203,17 @@ public class ZombieBrain : MonoBehaviour
             }
         }
         if (controlador != null) controlador.OnDamaged += AlRecibirDano;
+
+        // Sonidos (si el prefab lleva ZombieAudio).
+        audioZombi = GetComponent<ZombieAudio>();
+
+        // VARIEDAD: que no parezcan clones. Cada zombi va un pelín más rápido o más
+        // lento, es algo más grande o más pequeño y golpea a otro ritmo. Es barato y en
+        // una horda se nota muchísimo.
+        if (animador != null) animador.speed = Random.Range(0.92f, 1.09f);
+        float escala = Random.Range(0.93f, 1.07f);
+        transform.localScale = new Vector3(escala, escala, escala);
+        cadenciaDeAtaque *= Random.Range(0.85f, 1.15f);
     }
 
     private void OnEnable()
@@ -488,6 +500,7 @@ public class ZombieBrain : MonoBehaviour
         if (Time.time < siguienteAtaque) return;
         siguienteAtaque = Time.time + 1f / Mathf.Max(0.05f, cadenciaDeAtaque);
         golpeAplicado = false;
+        if (audioZombi != null) audioZombi.SonarAtaque();
     }
 
     private void Buscar()
@@ -656,6 +669,7 @@ public class ZombieBrain : MonoBehaviour
     private void AlRecibirDano(ZombieController quien, float cantidad)
     {
         if (estado == Estado.Muerto) return;
+        if (audioZombi != null) audioZombi.SonarDano();
         aturdidoHasta = Time.time + duracionDelFlinch;
         empujeExtra = -transform.forward * fuerzaDelFlinch;
         empujeExtraHasta = Time.time + duracionDelFlinch;
@@ -679,6 +693,7 @@ public class ZombieBrain : MonoBehaviour
     {
         estado = Estado.Muerto;
         if (AgenteListo) agente.isStopped = true;
+        if (audioZombi != null) audioZombi.SonarMuerte();
         ActualizarAnimador();
         if (HordeDirector.Instancia != null) HordeDirector.Instancia.Desregistrar(this);
     }

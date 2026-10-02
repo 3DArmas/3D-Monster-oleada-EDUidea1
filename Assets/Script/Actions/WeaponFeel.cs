@@ -132,9 +132,14 @@ public class WeaponFeel : MonoBehaviour
         }
 
         // --- Recarga ---
+        // OJO: hay que leer SIEMPRE el arma equipada. Si se cachea la anterior, al
+        // cambiar de arma se seguia leyendo la guardada (que podia quedar recargando)
+        // y la pose de recarga se quedaba pegada para siempre.
+        if (arma == null || !arma.gameObject.activeInHierarchy)
+        {
+            if (Time.time > siguienteBusqueda) { siguienteBusqueda = Time.time + 0.2f; BuscarJugador(); }
+        }
         bool recargando = arma != null && arma.IsReloading;
-        if (recargando && arma == null) recargando = false;
-        if (arma == null && Time.time > siguienteBusqueda) { siguienteBusqueda = Time.time + 0.5f; BuscarJugador(); }
         recargaMezcla = Mathf.Lerp(recargaMezcla, recargando ? 1f : 0f, dt * recargaVelocidad);
 
         // --- Retroceso ---

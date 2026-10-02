@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -45,8 +44,17 @@ public class WeaponAmmo : MonoBehaviour
 
     private float emptySince = -1f;
 
+    // La recarga NO puede ser una corrutina: al cambiar de arma, WeaponSwitcher
+    // desactiva el GameObject y la corrutina moria a medias, dejando IsReloading en
+    // true para siempre (pose de recarga congelada y el arma sin poder disparar).
+    // Con una marca de tiempo el estado es claro y se puede cerrar o cancelar.
+    private float recargaTerminaEn = -1f;
+
     private void Update()
     {
+        // Cerrar la recarga en curso aunque el arma se haya guardado mientras recargaba.
+        if (IsReloading && Time.time >= recargaTerminaEn) TerminarRecarga();
+
         if (!autoReloadWhenEmpty) return;
 
         if (IsReloading || Magazine > 0 || Reserve <= 0)
@@ -66,6 +74,16 @@ public class WeaponAmmo : MonoBehaviour
             emptySince = -1f;
             StartReload();
         }
+    }
+
+    private void OnDisable()
+    {
+        // Al guardar el arma se CANCELA la recarga en curso. Es lo correcto por dos
+        // motivos: nada de poses de recarga congeladas al volver a sacarla, y nada de
+        // "recargas zombis" (cambiar de arma no puede servir para saltarse la recarga).
+        // Un GameObject desactivado NO ejecuta Update, asi que cerrar la recarga aqui
+        // es la unica forma de que nunca se quede a medias.
+        CancelReload();
     }
 
     private bool initialized;
@@ -118,23 +136,31 @@ public class WeaponAmmo : MonoBehaviour
     public void StartReload()
     {
         if (IsReloading || IsMagazineFull || Reserve <= 0) return;
-        StartCoroutine(ReloadRoutine());
+
+        IsReloading = true;
+        recargaTerminaEn = Time.time + reloadTime;
+        PlaySound(reloadSound);
     }
 
-    private IEnumerator ReloadRoutine()
+    /// <summary>La recarga ha llegado a su fin: se pasa la municion de la reserva.</summary>
+    private void TerminarRecarga()
     {
-        IsReloading = true;
-        PlaySound(reloadSound);
-
-        yield return new WaitForSeconds(reloadTime);
-
         int needed = magazineSize - Magazine;
         int taken = Mathf.Min(needed, Reserve);
         Magazine += taken;
         Reserve -= taken;
 
         IsReloading = false;
+        recargaTerminaEn = -1f;
         Notify();
+    }
+
+    /// <summary>Cancela la recarga en curso (reinicio de ronda, relleno completo...).</summary>
+    public void CancelReload()
+    {
+        if (!IsReloading) return;
+        IsReloading = false;
+        recargaTerminaEn = -1f;
     }
 
     /// <summary>Anade municion a la reserva (compras de tienda). Devuelve lo que realmente entro.</summary>
@@ -153,6 +179,7 @@ public class WeaponAmmo : MonoBehaviour
     /// <summary>Rellena cargador y reserva al maximo (botiquin de municion / reinicio).</summary>
     public void RefillAll()
     {
+        CancelReload();
         Magazine = magazineSize;
         Reserve = maxReserve;
         Notify();
