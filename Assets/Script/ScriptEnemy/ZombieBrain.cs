@@ -52,8 +52,12 @@ public class ZombieBrain : MonoBehaviour
     [SerializeField] private float distanciaDeParada = 1.3f;
     [Tooltip("Cada cuánto, como mínimo, se recalcula la ruta.")]
     [SerializeField] private float cadaRecalculoDeRuta = 0.35f;
+    [Tooltip("Cada cuánto se refresca la ruta cuando el jugador está CERCA (mucho más a menudo).")]
+    [SerializeField] private float cadaRecalculoDeRutaCerca = 0.1f;
     [Tooltip("Si el destino se movió más que esto, se recalcula aunque no toque.")]
     [SerializeField] private float movimientoMinimoParaRecalcular = 0.8f;
+    [Tooltip("Igual que el anterior pero cuando el jugador está cerca: reacciona antes a sus giros.")]
+    [SerializeField] private float movimientoMinimoParaRecalcularCerca = 0.3f;
 
     [Header("Anti-solape (sin deslizarse)")]
     [Tooltip("Distancia mínima entre zombis: SOLO evita que dos ocupen el mismo sitio. " +
@@ -176,7 +180,7 @@ public class ZombieBrain : MonoBehaviour
         {
             agente.avoidancePriority = Random.Range(20, 80);
             agente.stoppingDistance = distanciaDeParada;
-            agente.autoBraking = true;
+            agente.autoBraking = false;
             agente.obstacleAvoidanceType = ObstacleAvoidanceType.GoodQualityObstacleAvoidance;
         }
 
@@ -518,16 +522,31 @@ public class ZombieBrain : MonoBehaviour
     private void IrA(Vector3 destino, float velocidad)
     {
         agente.updateRotation = true;
-        if (!Mathf.Approximately(agente.speed, velocidad)) agente.speed = velocidad;
         if (agente.isStopped) agente.isStopped = false;
 
+        Vector3 hacia = destino - transform.position;
+        hacia.y = 0f;
+
+        // ¿Jugador cerca? Entonces se refresca la ruta MUCHO más a menudo. Con el
+        // refresco lento (0.35 s) el zombi perseguía un punto viejo y parecía que no
+        // reaccionaba a los giros del jugador.
+        bool cerca = jugador != null && (jugador.position - transform.position).sqrMagnitude <= radioDeReaccionRapida * radioDeReaccionRapida;
+        float espera = cerca ? cadaRecalculoDeRutaCerca : cadaRecalculoDeRuta;
+        float umbral = cerca ? movimientoMinimoParaRecalcularCerca : movimientoMinimoParaRecalcular;
+
+        // Girar y correr a la vez se ve como patinar. Si el giro es grande se frena: el
+        // zombi gira sobre sí mismo y luego acelera. Se ve mucho más natural.
+        float angulo = hacia.sqrMagnitude > 0.01f ? Vector3.Angle(transform.forward, hacia) : 0f;
+        float velocidadFinal = angulo > 50f ? velocidad * 0.45f : velocidad;
+        if (!Mathf.Approximately(agente.speed, velocidadFinal)) agente.speed = velocidadFinal;
+
         bool tocaPorTiempo = Time.time >= siguienteRuta;
-        bool seMovioElDestino = (destino - ultimoDestino).sqrMagnitude > movimientoMinimoParaRecalcular * movimientoMinimoParaRecalcular;
+        bool seMovioElDestino = (destino - ultimoDestino).sqrMagnitude > umbral * umbral;
         if (!tocaPorTiempo && !seMovioElDestino) return;
 
         agente.SetDestination(destino);
         ultimoDestino = destino;
-        siguienteRuta = Time.time + cadaRecalculoDeRuta;
+        siguienteRuta = Time.time + espera;
     }
 
     // ------------------------------------------------------------------

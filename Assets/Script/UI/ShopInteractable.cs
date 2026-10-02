@@ -32,7 +32,6 @@ public class ShopInteractable : MonoBehaviour
     private Camera playerCamera;
     private Transform player;
     private InputAction interactAction;
-    private InputAction fireAction;
     private bool visible;
     private bool aiming;
     /// <summary>Hay que soltar el boton antes de poder volver a abrir. Si no, con el
@@ -88,22 +87,18 @@ public class ShopInteractable : MonoBehaviour
 
         if (!aiming) return;
 
-        if (hud != null) hud.ShowMessage("PULSA  [E]  O  CLIC  PARA ABRIR LA TIENDA", 0.2f);
+        if (hud != null) hud.ShowMessage("[E]  ABRIR TIENDA", 0.2f);
 
         // Si acaba de abrir o cerrar, hay que soltar el boton antes de poder abrir otra vez.
         if (esperandoSoltar)
         {
-            bool suelto = (interactAction == null || !interactAction.IsPressed())
-                       && (fireAction == null || !fireAction.IsPressed());
+            bool suelto = (interactAction == null || !interactAction.IsPressed());
             if (suelto) esperandoSoltar = false;
             return;
         }
 
-        // Abrir con E o con clic (el mismo boton que dispara). Se usa IsPressed y no
-        // WasPressedThisFrame: asi basta con mantener pulsado y no depende de que la
-        // pulsacion caiga exactamente en el frame del Update.
-        if (interactAction != null && interactAction.IsPressed()) { Open(); return; }
-        if (fireAction != null && fireAction.IsPressed()) { Open(); return; }
+        // Solo con la tecla E (el clic ya no abre la tienda).
+        if (interactAction != null && interactAction.IsPressed()) Open();
     }
 
     private bool IsBeingAimedAt()
@@ -173,11 +168,7 @@ public class ShopInteractable : MonoBehaviour
         if (playerCamera != null && interactAction == null)
         {
             PlayerInput input = playerCamera.GetComponentInParent<PlayerInput>();
-            if (input != null)
-            {
-                interactAction = input.actions.FindAction("Interact");
-                fireAction = input.actions.FindAction("Fire");
-            }
+            if (input != null) interactAction = input.actions.FindAction("Interact");
         }
     }
 }
