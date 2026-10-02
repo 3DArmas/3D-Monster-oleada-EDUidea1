@@ -19,9 +19,16 @@ public class ShopUI : MonoBehaviour
     [SerializeField] private Text infoText;
     [SerializeField] private Text titleText;
 
+    [Tooltip("Etiqueta DINERO del sobre. Si esta asignada, moneyText solo muestra la cifra.")]
+    [SerializeField] private Text moneyLabelText;
+
     [Header("Pestanas")]
     [SerializeField] private Button[] tabButtons;
     [SerializeField] private Image[] tabFondos;
+    [SerializeField] private Color tabOnColor = Color.white;
+    [SerializeField] private Color tabOffColor = new Color(0.66f, 0.62f, 0.56f, 1f);
+    [Tooltip("Escala de la pestana seleccionada (la cinta se levanta un poco).")]
+    [SerializeField] private float tabOnScale = 1.06f;
 
     [Header("Tarjetas")]
     [SerializeField] private RectTransform cardContainer;
@@ -37,9 +44,6 @@ public class ShopUI : MonoBehaviour
 
     [Header("Cursor")]
     [SerializeField] private Texture2D cursorMano;
-
-    private static readonly Color FondoPestanaOn = new Color(0.28f, 0.18f, 0.13f, 1f);
-    private static readonly Color FondoPestanaOff = new Color(0.14f, 0.11f, 0.09f, 1f);
 
     public static bool IsAnyOpen { get; private set; }
     public bool IsOpen => panel != null && panel.activeSelf;
@@ -141,8 +145,15 @@ public class ShopUI : MonoBehaviour
         categoriaActual = (ShopCategory)Mathf.Clamp(indice, 0, 4);
 
         if (tabFondos != null)
+        {
             for (int i = 0; i < tabFondos.Length; i++)
-                if (tabFondos[i] != null) tabFondos[i].color = (i == indice) ? FondoPestanaOn : FondoPestanaOff;
+            {
+                if (tabFondos[i] == null) continue;
+                bool activa = i == indice;
+                tabFondos[i].color = activa ? tabOnColor : tabOffColor;
+                tabFondos[i].rectTransform.localScale = Vector3.one * (activa ? tabOnScale : 1f);
+            }
+        }
 
         ConstruirTarjetas();
     }
@@ -271,7 +282,11 @@ public class ShopUI : MonoBehaviour
 
     private void RefrescarDinero()
     {
-        if (moneyText != null && moneySystem != null) moneyText.text = "DINERO  $" + moneySystem.Money.ToString("N0");
+        if (moneyText == null || moneySystem == null) return;
+
+        string cifra = "$" + moneySystem.Money.ToString("N0");
+        if (moneyLabelText != null) moneyText.text = cifra;
+        else moneyText.text = "DINERO  " + cifra;
     }
 
     private void RefrescarEstado()
