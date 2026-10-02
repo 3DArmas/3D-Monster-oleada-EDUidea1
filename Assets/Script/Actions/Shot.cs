@@ -37,6 +37,9 @@ public class Shot : MonoBehaviour
     private InputAction reloadAction;
     private float nextShotTime = 0f;
 
+    /// <summary>Avisa cada vez que un arma dispara (lo usan el retroceso y el fogonazo).</summary>
+    public static event System.Action OnAnyShot;
+
     /// <summary>La tienda sube el dano de este arma (1.10 = +10 %).</summary>
     public void MejorarDano(float factor)
     {
@@ -86,6 +89,7 @@ public class Shot : MonoBehaviour
 
         Shoot();
         nextShotTime = Time.time + shotRate;
+        OnAnyShot?.Invoke();
     }
 
     /// <summary>Pide la recarga al sistema de municion del arma.</summary>
