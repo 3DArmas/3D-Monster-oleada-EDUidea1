@@ -28,6 +28,15 @@ public class ZombieBrain : MonoBehaviour
     [Range(20f, 360f)][SerializeField] private float anguloDeVision = 140f;
     [Tooltip("Hasta dónde le llega un aviso de la horda (disparos, gritos...).")]
     [SerializeField] private float rangoDeOido = 22f;
+    [Tooltip("RADIO DE CONTACTO: a esta distancia el zombi te 'huele' aunque esté de espaldas " +
+             "y sin línea de vista. Sin esto se quedaba mirando sin reaccionar cuando lo tenías encima.")]
+    [SerializeField] private float radioDeContacto = 2.5f;
+    [Tooltip("Si el jugador está más cerca que esto, el zombi piensa al instante (no espera turno).")]
+    [SerializeField] private float radioDeReaccionRapida = 4.5f;
+    [Tooltip("Cada cuánto revisa la cercanía en el ritmo rápido.")]
+    [SerializeField] private float cadaChequeoRapido = 0.05f;
+    [Tooltip("Pausa de 'te he visto' antes de poder atacar (0 = reacción instantánea).")]
+    [SerializeField] private float retardoDeReaccion = 0.12f;
     [Tooltip("Punto desde el que mira (si se deja vacío se usa la cabeza o este objeto).")]
     [SerializeField] private Transform ojos;
     [Tooltip("Capas que tapan la visión (muros, rocas...).")]
@@ -104,10 +113,15 @@ public class ZombieBrain : MonoBehaviour
 
     // --- Control de tiempos (imprescindible para que no vayan "a lo loco") ---
     [Header("Ritmo de pensamiento")]
-    [Tooltip("Cada cuánto piensa este zombi como máximo (segundos). El director reparte los turnos encima de esto.")]
+    [Tooltip("Cada cuánto piensa como máximo cuando está LEJOS del jugador (segundos).")]
     [SerializeField] private float intervaloDePensamiento = 0.2f;
+    [Tooltip("Cada cuánto piensa cuando está CERCA (reacciona mucho más rápido).")]
+    [SerializeField] private float intervaloDePensamientoCerca = 0.05f;
 
     private float siguientePensamiento;
+    private float siguienteChequeoRapido;
+    private float reaccionHasta;
+    private bool yaTeVi;
     private float inicioDeVentana;
     private float distanciaAcumulada;
 
@@ -219,8 +233,30 @@ public class ZombieBrain : MonoBehaviour
         if (estado == Estado.Muerto || !AgenteListo) return;
 
         AplicarSeparacion();
-        EncararSiAtaca();
-        if (estado == Estado.Atacar) ComprobarGolpe();
+
+        // REACCIÓN RÁPIDA: si el jugador está encima, este zombi NO espera su turno del
+        // director: piensa enseguida. Es barato porque solo lo hacen los que están cerca.
+        if (jugador != null && Time.time >= siguienteChequeoRapido)
+        {
+            siguienteChequeoRapido = Time.time + cadaChequeoRapido;
+            if (Vector3.Distance(transform.position, jugador.position) <= radioDeReaccionRapida) TickLento(true);
+        }
+
+        if (estado == Estado.Atacar)
+        {
+            ComprobarGolpe();
+
+            // OJO: un NavMeshAgent PARADO no gira (comportamiento de Unity). Si está
+            // pegado al jugador y no puede avanzar, se le ayuda a mirarlo a mano.
+            if (agente.velocity.sqrMagnitude < 0.01f && jugador != null)
+            {
+                Vector3 hacia = jugador.position - transform.position;
+                hacia.y = 0f;
+                if (hacia.sqrMagnitude > 0.01f)
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(hacia), 10f * Time.deltaTime);
+            }
+        }
+
         ActualizarAnimador();
     }
 
@@ -282,12 +318,8 @@ public class ZombieBrain : MonoBehaviour
 
     private void EncararSiAtaca()
     {
-        if (estado != Estado.Atacar || jugador == null) return;
-        agente.updateRotation = false;
-        Vector3 direccion = jugador.position - transform.position;
-        direccion.y = 0f;
-        if (direccion.sqrMagnitude > 0.01f)
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direccion), 8f * Time.deltaTime);
+        // Ya no se usa: la rotación la lleva el agente (con angularSpeed alto) y, cuando
+        // está parado y no puede girar, se le ayuda desde Update.
     }
 
     private void ActualizarAnimador()
@@ -303,15 +335,16 @@ public class ZombieBrain : MonoBehaviour
     // ------------------------------------------------------------------
 
     /// <summary>Sentidos + decisión + ruta. Se ejecuta por turnos, no cada frame.</summary>
-    public void TickLento()
+    public void TickLento(bool forzar = false)
     {
         if (estado == Estado.Muerto) return;
 
-        // Ritmo de pensamiento limitado POR RELOJ (no por número de ticks). Sin esto,
-        // con muchos zombis cada cerebro pensaba decenas de veces por segundo y el
-        // detector de atascos se disparaba sin parar: el zombi iba a los lados.
-        if (Time.time < siguientePensamiento) return;
-        siguientePensamiento = Time.time + intervaloDePensamiento * Random.Range(0.85f, 1.15f);
+        // Ritmo ADAPTATIVO: de cerca piensa casi al instante; de lejos ahorra CPU.
+        float distanciaAlJugador = jugador != null ? Vector3.Distance(transform.position, jugador.position) : 999f;
+        float intervalo = distanciaAlJugador <= radioDeReaccionRapida ? intervaloDePensamientoCerca : intervaloDePensamiento;
+
+        if (!forzar && Time.time < siguientePensamiento) return;
+        siguientePensamiento = Time.time + intervalo * Random.Range(0.85f, 1.15f);
 
         // Auto-reparación: si no está registrado en el director (por una recarga de
         // dominio, por ejemplo), se registra aquí. Así nunca se queda "sin cerebro".
@@ -334,6 +367,15 @@ public class ZombieBrain : MonoBehaviour
 
         VeAlJugador = PercibirAlJugador();
 
+        // Pausa de "te he visto": al detectarte por primera vez se queda un instante
+        // mirándote antes de poder golpear. Se siente deliberado y avisa al jugador.
+        if (VeAlJugador && !yaTeVi)
+        {
+            yaTeVi = true;
+            reaccionHasta = Time.time + retardoDeReaccion;
+        }
+        else if (!VeAlJugador && !DebeBuscar()) yaTeVi = false;
+
         // --- Decisión ---
         if (VeAlJugador)
         {
@@ -343,7 +385,8 @@ public class ZombieBrain : MonoBehaviour
 
         float distancia = Vector3.Distance(transform.position, jugador.position);
 
-        if (VeAlJugador && distancia <= distanciaDeAtaque) estado = Estado.Atacar;
+        bool puedeAtacar = Time.time >= reaccionHasta;
+        if (VeAlJugador && distancia <= distanciaDeAtaque && puedeAtacar) estado = Estado.Atacar;
         else if (VeAlJugador) estado = Estado.Perseguir;
         else if (DebeBuscar()) estado = Estado.Buscar;
         else estado = Estado.Vagar;
@@ -384,6 +427,11 @@ public class ZombieBrain : MonoBehaviour
         float distancia = hacia.magnitude;
 
         if (distancia > rangoDeVision) return false;
+
+        // RADIO DE CONTACTO: a bocajarro te detecta aunque esté de espaldas y sin línea
+        // de vista (te huele). Antes, de espaldas a 1 metro, no te veía: se quedaba
+        // parado mirando y parecía tonto.
+        if (distancia <= radioDeContacto) return true;
 
         // Cono de visión (si ya está alertado, mira en todas direcciones: ya sabe dónde estás).
         if (!alertado)

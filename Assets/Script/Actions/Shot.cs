@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// Disparo del arma: apunta al centro de la camara y lanza una bala fisica.
@@ -64,6 +65,11 @@ public class Shot : MonoBehaviour
 
     private void Update()
     {
+        // Si la INTERFAZ tiene el control (tienda, pausa o game over), el clic no dispara.
+        // Esto era lo que hacía que el botón REINTENTAR disparase el arma.
+        if (Cursor.lockState != CursorLockMode.Locked) return;
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+
         // Recargar: accion "Reload" del asset de input (tecla R), igual que Fire.
         // Antes se leia el teclado directo y no llegaba a detectarse la pulsacion.
         bool reloadPressed = reloadAction != null

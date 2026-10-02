@@ -113,9 +113,9 @@ NavMeshAgent:
   m_AgentTypeID: 0
   m_Radius: 0.46277577
   m_Speed: 3.5
-  m_Acceleration: 8
+  m_Acceleration: 16
   avoidancePriority: 50
-  m_AngularSpeed: 120
+  m_AngularSpeed: 420
   m_StoppingDistance: 0.25
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
@@ -187,6 +187,10 @@ MonoBehaviour:
   rangoDeVision: 24
   anguloDeVision: 140
   rangoDeOido: 22
+  radioDeContacto: 2.5
+  radioDeReaccionRapida: 4.5
+  cadaChequeoRapido: 0.05
+  retardoDeReaccion: 0.12
   ojos: {fileID: 0}
   capasQueTapanLaVista:
     serializedVersion: 2
@@ -218,6 +222,7 @@ MonoBehaviour:
   usarDanoDelControlador: 1
   dibujarSentidos: 0
   intervaloDePensamiento: 0.2
+  intervaloDePensamientoCerca: 0.05
 --- !u!1001 &1215446029693094941
 PrefabInstance:
   m_ObjectHideFlags: 0
