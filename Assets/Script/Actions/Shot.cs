@@ -61,6 +61,12 @@ public class Shot : MonoBehaviour
 
         if (ammo == null)
             ammo = GetComponent<WeaponAmmo>();
+
+        // Las armas ahora son PREFABS y un prefab no puede guardar la referencia a la
+        // camara de la escena (se perderia al guardarlo). Asi que el arma se busca la
+        // camara sola. Sin esto, Shoot() avisaba de que playerCamera no estaba asignada
+        // y el arma no disparaba.
+        if (playerCamera == null) playerCamera = Camera.main;
     }
 
     private void Update()
@@ -106,6 +112,11 @@ public class Shot : MonoBehaviour
 
     private void Shoot()
     {
+        // Red de seguridad: si el arma se creo en tiempo de ejecucion y aun no tiene
+        // camara, se busca aqui para no perder el disparo.
+        if (playerCamera == null) playerCamera = Camera.main;
+        if (playerCamera == null) return;
+
         // 1. Calculamos hacia donde apunta el centro de la camara (la mira)
         Vector3 aimPoint;
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));

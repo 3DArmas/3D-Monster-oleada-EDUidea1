@@ -64,28 +64,45 @@ public class WeaponSwitcher : MonoBehaviour
 
     private void Awake()
     {
-        var playerInput = GetComponentInParent<PlayerInput>();
         if (audioSource == null) audioSource = GetComponent<AudioSource>();
-
-        if (playerInput != null && slots != null)
-        {
-            accionesSlot = new InputAction[slots.Length];
-            for (int i = 0; i < slots.Length; i++) accionesSlot[i] = playerInput.actions["Slot" + (i + 1)];
-        }
-
-        InstanciarTodas();
+        InstanciarTodas();          // las armas, cuanto antes mejor
     }
 
     private void Start()
     {
+        ResolverAcciones();
         if (slots == null) return;
         for (int i = 0; i < slots.Length; i++)
             if (slots[i] != null && slots[i].desbloqueada) { Equipar(i); break; }
     }
 
+    /// <summary>
+    /// Busca las acciones de slot. Se hace en Start (no en Awake) porque el PlayerInput
+    /// crea su instancia jugable de acciones en su OnEnable: si se piden antes, se
+    /// obtienen las del asset, que estan desactivadas y nunca detectan pulsaciones.
+    /// </summary>
+    private void ResolverAcciones()
+    {
+        if (slots == null) return;
+
+        var playerInput = GetComponentInParent<PlayerInput>();
+        if (playerInput == null) playerInput = FindFirstObjectByType<PlayerInput>();
+        if (playerInput == null || playerInput.actions == null) return;
+
+        accionesSlot = new InputAction[slots.Length];
+        for (int i = 0; i < slots.Length; i++)
+        {
+            // OJO: FindAction devuelve null si la accion no existe, pero el indexador
+            // playerInput.actions["Slot3"] LANZA KeyNotFoundException. Esa excepcion
+            // abortaba el Awake y, con el, la creacion de las armas: el jugador se
+            // quedaba sin arma y sin nada en la mano.
+            accionesSlot[i] = playerInput.actions.FindAction("Slot" + (i + 1), false);
+        }
+    }
+
     private void Update()
     {
-        if (accionesSlot == null) return;
+        if (accionesSlot == null) { ResolverAcciones(); if (accionesSlot == null) return; }
         for (int i = 0; i < accionesSlot.Length; i++)
             if (accionesSlot[i] != null && accionesSlot[i].WasPressedThisFrame()) Equipar(i);
     }

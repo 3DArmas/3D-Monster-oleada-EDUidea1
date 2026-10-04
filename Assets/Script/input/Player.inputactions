@@ -71,9 +71,18 @@
                 },
                 {
                     "name": "Interact",
-                    "id": "54cbae5c-4039-4f34-98b5-2e67d8c1d534",
                     "type": "Button",
+                    "id": "54cbae5c-4039-4f34-98b5-2e67d8c1d534",
                     "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Slot3",
+                    "type": "Button",
+                    "id": "7ce081a2-0c76-443f-81e1-5a6d7412a189",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -220,6 +229,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1305a0af-81ea-4804-95c3-6fe6729ff43e",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Slot3",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
