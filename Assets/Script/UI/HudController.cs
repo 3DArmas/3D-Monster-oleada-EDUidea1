@@ -175,7 +175,27 @@ public class HudController : MonoBehaviour
         foreach (WeaponAmmo w in weapons)
             if (w != null && w.gameObject.activeInHierarchy) return w;
 
+        // Las armas ahora se INSTANCIAN en el Awake del WeaponSwitcher bajo la mano, asi
+        // que la lista cacheada puede estar vacia o desfasada: se vuelve a buscar sola.
+        RefrescarArmas();
+        foreach (WeaponAmmo w in weapons)
+            if (w != null && w.gameObject.activeInHierarchy) return w;
+
         return null;
+    }
+
+    /// <summary>Vuelve a engancharse a las armas que existan ahora mismo (HUD de municion).</summary>
+    public void RefrescarArmas()
+    {
+        foreach (WeaponAmmo w in weapons)
+            if (w != null) w.OnAmmoChanged -= HandleAmmoChanged;
+
+        weapons.Clear();
+        foreach (WeaponAmmo w in FindObjectsByType<WeaponAmmo>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            weapons.Add(w);
+            w.OnAmmoChanged += HandleAmmoChanged;
+        }
     }
 
     private void RefreshWeapon(bool force = false)
