@@ -14,7 +14,8 @@ public enum ShopEffect
     Velocidad,      // multiplica la velocidad de movimiento
     Salto,          // multiplica la altura de salto
     Dano,           // + dano de las armas
-    RecargaRapida   // recarga mas rapido
+    RecargaRapida,  // recarga mas rapido
+    DesbloquearArma // desbloquea en el WeaponSwitcher el arma cuyo id coincide
 }
 
 /// <summary>
@@ -75,9 +76,13 @@ public static class ShopCatalog
         new ShopItem("dano", "+10 % DAÑO", "Tus balas hacen más daño.", ShopCategory.Combate, ShopEffect.Dano, 700, 400, 3, 1.10f),
         new ShopItem("recarga", "RECARGA RÁPIDA", "Recargas un 25 % más rápido.", ShopCategory.Combate, ShopEffect.RecargaRapida, 650, 0, 1, 0.75f),
         new ShopItem("cargador", "CARGADOR AMPLIADO", "Más balas por cargador.", ShopCategory.Combate, ShopEffect.Ninguno, 800, 0, 1, 0f, true),
-        new ShopItem("escopeta", "ESCOPETA", "Arma nueva para el slot 4.", ShopCategory.Armas, ShopEffect.Ninguno, 1200, 0, 1, 0f, true),
-        new ShopItem("subfusil", "SUBFUSIL", "Arma nueva para el slot 5.", ShopCategory.Armas, ShopEffect.Ninguno, 1800, 0, 1, 0f, true),
-        new ShopItem("rifle", "RIFLE DE FRANCOTIRADOR", "Arma nueva para el slot 6.", ShopCategory.Armas, ShopEffect.Ninguno, 2500, 0, 1, 0f, true),
+        // Las armas se desbloquean en el WeaponSwitcher: el id del articulo tiene que
+        // coincidir con el id del slot (c1911, mk18, escopeta, subfusil, rifle).
+        new ShopItem("c1911", "C1911", "Pistola .45 ligera y precisa.", ShopCategory.Armas, ShopEffect.DesbloquearArma, 700, 0, 1, 0f),
+        new ShopItem("mk18", "MK18", "Rifle de asalto rapido y equilibrado.", ShopCategory.Armas, ShopEffect.DesbloquearArma, 1000, 0, 1, 0f),
+        new ShopItem("escopeta", "ESCOPETA 590A1", "Devastadora de cerca, bombeo lento.", ShopCategory.Armas, ShopEffect.DesbloquearArma, 1500, 0, 1, 0f),
+        new ShopItem("subfusil", "SUBFUSIL SMG5", "Cadencia altisima y cargador grande.", ShopCategory.Armas, ShopEffect.DesbloquearArma, 1800, 0, 1, 0f),
+        new ShopItem("rifle", "R90", "Compacta de calibre 5.7, mucho dano por disparo.", ShopCategory.Armas, ShopEffect.DesbloquearArma, 2500, 0, 1, 0f),
 
         // ---------------- OBJETOS ----------------
         new ShopItem("botiquin", "BOTIQUÍN", "Cura 50 de vida al instante.", ShopCategory.Objetos, ShopEffect.Botiquin, 250, 0, 0, 50f),
@@ -102,7 +107,7 @@ public static class ShopCatalog
     {
         switch (c)
         {
-            case ShopCategory.Armas: return "escopeta · subfusil · rifle";
+            case ShopCategory.Armas: return "pistolas · rifles · escopeta";
             case ShopCategory.Municion: return "por arma";
             case ShopCategory.Movilidad: return "saltos · velocidad · dash";
             case ShopCategory.Combate: return "daño · recarga · cargador";

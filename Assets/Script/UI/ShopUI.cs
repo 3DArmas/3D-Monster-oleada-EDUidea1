@@ -266,6 +266,13 @@ public class ShopUI : MonoBehaviour
                 foreach (WeaponAmmo w in FindObjectsByType<WeaponAmmo>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                     w.MejorarRecarga(item.valorEfecto);
                 break;
+
+            case ShopEffect.DesbloquearArma:
+                // El id del articulo de tienda es el id del slot del WeaponSwitcher.
+                WeaponSwitcher cambiador = FindFirstObjectByType<WeaponSwitcher>(FindObjectsInactive.Include);
+                if (cambiador == null) Debug.LogWarning("La tienda vendio el arma '" + item.id + "' pero no hay WeaponSwitcher en la escena.");
+                else if (!cambiador.Desbloquear(item.id)) Debug.LogWarning("La tienda vendio el arma '" + item.id + "' pero ningun slot del WeaponSwitcher usa ese id.");
+                break;
         }
     }
 
