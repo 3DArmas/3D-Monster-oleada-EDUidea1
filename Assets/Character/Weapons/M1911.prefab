@@ -572,7 +572,7 @@ MonoBehaviour:
   maxAimDistance: 100
   damage: 25
   autoReloadWhenEmpty: 1
-  shootSound: {fileID: 8300000, guid: f266dfd555795d145b8aab13069628d8, type: 3}
+  shootSound: {fileID: 8300000, guid: 674a2a7e920ba3d4db69e283f3dbbaeb, type: 3}
   audioSource: {fileID: 167579522079036877}
 --- !u!82 &167579522079036877
 AudioSource:
@@ -586,8 +586,8 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 0.5
+  m_PlayOnAwake: 0
+  m_Volume: 0.85
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -688,9 +688,9 @@ MonoBehaviour:
   startingReserve: 96
   maxReserve: 96
   reloadTime: 1.8
-  reloadSound: {fileID: 0}
-  emptySound: {fileID: 0}
-  audioSource: {fileID: 0}
+  reloadSound: {fileID: 8300000, guid: 1dbde56d88948a34ba30c19e5d886a41, type: 3}
+  emptySound: {fileID: 8300000, guid: dd81254d35ec6a34db14d80c291388aa, type: 3}
+  audioSource: {fileID: 167579522079036877}
   autoReloadWhenEmpty: 1
   autoReloadDelay: 0.25
 --- !u!1 &6509085562326320303

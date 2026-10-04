@@ -108,7 +108,11 @@ public class WeaponAmmo : MonoBehaviour
         Magazine = magazineSize;
         Reserve = Mathf.Clamp(startingReserve, 0, maxReserve);
 
-        if (audioSource == null) audioSource = GetComponent<AudioSource>();
+        // Igual que en Shot: si la referencia apunta al AudioSource de OTRA arma (pasa al
+        // copiar el componente), los sonidos de recarga y de cargador vacio no suenan
+        // porque ese objeto esta desactivado.
+        if (audioSource == null || audioSource.gameObject != gameObject)
+            audioSource = GetComponent<AudioSource>();
     }
 
     private void Start()

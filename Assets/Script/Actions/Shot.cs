@@ -56,11 +56,25 @@ public class Shot : MonoBehaviour
             reloadAction = playerInput.actions.FindAction("Reload");
         }
 
-        if (audioSource == null)
+        // El AudioSource tiene que ser el de ESTA arma. Al copiar el Shot de otra arma la
+        // referencia puede quedar apuntando al arma original; y como esa arma esta
+        // desactivada cuando no es la equipada, su PlayOneShot no suena: el arma dispara
+        // en silencio. Por eso no basta con comprobar si es null.
+        if (audioSource == null || audioSource.gameObject != gameObject)
             audioSource = GetComponent<AudioSource>();
 
         if (ammo == null)
             ammo = GetComponent<WeaponAmmo>();
+
+        // El punto de disparo tiene que ser un hijo DE ESTE prefab. Al copiar el Shot de
+        // otra arma la referencia apunta fuera y se pierde al guardar, asi que si falta
+        // se busca el hijo llamado SPANWPOINT y, en ultimo caso, el propio arma.
+        if (spawnPoint == null)
+        {
+            foreach (Transform hijo in GetComponentsInChildren<Transform>(true))
+                if (hijo.name == "SPANWPOINT" || hijo.name == "SpawnPoint") { spawnPoint = hijo; break; }
+        }
+        if (spawnPoint == null) spawnPoint = transform;
 
         // Las armas ahora son PREFABS y un prefab no puede guardar la referencia a la
         // camara de la escena (se perderia al guardarlo). Asi que el arma se busca la

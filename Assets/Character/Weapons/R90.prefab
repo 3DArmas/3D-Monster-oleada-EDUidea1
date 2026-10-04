@@ -178,7 +178,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Shot
   bullet: {fileID: 5942878351229207751, guid: 732d8036732c395468f8ddb65f0bc4d2, type: 3}
-  spawnPoint: {fileID: 5892405840955497677, guid: 7d3869a9caf384c4f8a037f2bd5bbd8b, type: 3}
+  spawnPoint: {fileID: 1743812856105876910}
   playerCamera: {fileID: 0}
   ammo: {fileID: 6871047003330574904, guid: 7d3869a9caf384c4f8a037f2bd5bbd8b, type: 3}
   bulletSpeed: 60
@@ -186,8 +186,8 @@ MonoBehaviour:
   maxAimDistance: 100
   damage: 150
   autoReloadWhenEmpty: 1
-  shootSound: {fileID: 8300000, guid: dad76c57bb2cc6841a4effa80e651e93, type: 3}
-  audioSource: {fileID: 3904109832248575277, guid: 7d3869a9caf384c4f8a037f2bd5bbd8b, type: 3}
+  shootSound: {fileID: 8300000, guid: c75c78b8fe1e2184d9f1331968460fe5, type: 3}
+  audioSource: {fileID: 3246844648739504983}
 --- !u!114 &2675479326403899868
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,9 +205,9 @@ MonoBehaviour:
   startingReserve: 30
   maxReserve: 30
   reloadTime: 2.8
-  reloadSound: {fileID: 0}
-  emptySound: {fileID: 0}
-  audioSource: {fileID: 0}
+  reloadSound: {fileID: 8300000, guid: 1dbde56d88948a34ba30c19e5d886a41, type: 3}
+  emptySound: {fileID: 8300000, guid: dd81254d35ec6a34db14d80c291388aa, type: 3}
+  audioSource: {fileID: 3246844648739504983}
   autoReloadWhenEmpty: 1
   autoReloadDelay: 0.25
 --- !u!82 &3246844648739504983
@@ -222,8 +222,8 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 0.5
+  m_PlayOnAwake: 0
+  m_Volume: 0.85
   m_Pitch: 1
   Loop: 0
   Mute: 0
