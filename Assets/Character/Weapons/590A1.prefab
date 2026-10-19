@@ -467,6 +467,7 @@ GameObject:
   - component: {fileID: 3791296359599929115}
   - component: {fileID: 181410011353724943}
   - component: {fileID: 7686896522921865800}
+  - component: {fileID: 3038734891831643033}
   m_Layer: 0
   m_Name: 590A1
   m_TagString: Untagged
@@ -512,7 +513,7 @@ MonoBehaviour:
   maxAimDistance: 100
   damage: 12
   autoReloadWhenEmpty: 1
-  shootSound: {fileID: 8300000, guid: a76cf4b3d7d25ea4c86f6046dc68046f, type: 3}
+  shootSound: {fileID: 8300000, guid: 756de044ba931ee44993220be00eb7ac, type: 3}
   audioSource: {fileID: 7686896522921865800}
 --- !u!114 &181410011353724943
 MonoBehaviour:
@@ -530,9 +531,9 @@ MonoBehaviour:
   magazineSize: 6
   startingReserve: 48
   maxReserve: 48
-  reloadTime: 2.4
-  reloadSound: {fileID: 8300000, guid: 1dbde56d88948a34ba30c19e5d886a41, type: 3}
-  emptySound: {fileID: 8300000, guid: dd81254d35ec6a34db14d80c291388aa, type: 3}
+  reloadTime: 1.85
+  reloadSound: {fileID: 8300000, guid: 86e27bace567aa1498435ae7cd17a42a, type: 3}
+  emptySound: {fileID: 8300000, guid: ba1ff6e325a8c3b41b5619b07eaab352, type: 3}
   audioSource: {fileID: 7686896522921865800}
   autoReloadWhenEmpty: 1
   autoReloadDelay: 0.25
@@ -633,6 +634,32 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3038734891831643033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2956346148036594895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c99eb14d547b9f47b05cbbc3211c0fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponAnim
+  tipo: 2
+  tiempoDeSaque: 0.22
+  caidaAlSacar: 0.14
+  inclinacionAlSacar: 18
+  retrocesoAtras: 0.032
+  retrocesoArriba: 5
+  retrocesoDureza: 17
+  recargaBajada: 0.07
+  recargaAtras: 0.03
+  recargaPitch: 34
+  recargaRoll: -12
+  recargaTraqueteo: 0.009
+  anguloCorte: 55
+  duracionCorte: 0.18
 --- !u!1 &2962357868750147481
 GameObject:
   m_ObjectHideFlags: 0

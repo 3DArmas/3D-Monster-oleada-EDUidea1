@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4203853254377866484}
   - component: {fileID: 6820902397431797693}
-  - component: {fileID: 5058654925948927173}
   m_Layer: 0
   m_Name: WeaponHolder
   m_TagString: Untagged
@@ -36,34 +35,6 @@ Transform:
   m_Father: {fileID: 6231051835759261196}
   m_LocalEulerAnglesHint: {x: 0, y: -202.168, z: 0}
 --- !u!114 &6820902397431797693
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 355310906393861059}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06f44317665618445968fab35296bec5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WeaponFeel
-  camara: {fileID: 6231051835759261196}
-  swayPosicion: 0.03
-  swayRotacion: 2.2
-  swayLimite: 0.05
-  swaySuavizado: 7
-  bobFrecuencia: 8.5
-  bobVertical: 0.011
-  bobLateral: 0.008
-  bobVelocidadMinima: 0.4
-  retrocesoPosicion: {x: 0, y: 0.01, z: -0.055}
-  retrocesoRotacion: {x: -3.2, y: 0.9, z: 0}
-  retrocesoVuelta: 10
-  golpeCamara: 0.012
-  recargaPosicion: {x: 0, y: -0.1, z: 0.03}
-  recargaRotacion: {x: 26, y: 0, z: 7}
-  recargaVelocidad: 7
---- !u!114 &5058654925948927173
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2297,6 +2268,7 @@ GameObject:
   - component: {fileID: 5494747973068921187}
   - component: {fileID: 486046873204730368}
   - component: {fileID: 1694322570579636112}
+  - component: {fileID: 8939504793477123657}
   m_Layer: 0
   m_Name: Player(Body)
   m_TagString: Player
@@ -2509,57 +2481,65 @@ MonoBehaviour:
     prefab: {fileID: 6761893087589767841, guid: 7d3869a9caf384c4f8a037f2bd5bbd8b, type: 3}
     desbloqueada: 1
     icono: {fileID: 0}
-    posicionEnMano: {x: 0, y: 0, z: 0}
-    rotacionEnMano: {x: -1.4216828e-14, y: 0.0000009893832, z: 0.0000016466103}
-    escalaEnMano: 1.224
+    posicionEnMano: {x: 0, y: 0.05, z: 0.01}
+    rotacionEnMano: {x: 89.98, y: 180, z: 0}
+    escalaEnMano: 1
   - id: m1911
     nombre: M1911
     prefab: {fileID: 5939182626756748425, guid: 80c481485c737d7448dcc037cdb8fff2, type: 3}
     desbloqueada: 1
     icono: {fileID: 0}
-    posicionEnMano: {x: 0, y: 0, z: 0}
-    rotacionEnMano: {x: -1.4216828e-14, y: 0.0000009893832, z: 0.0000016466103}
-    escalaEnMano: 0.832
+    posicionEnMano: {x: 0, y: 0.05, z: 0.02}
+    rotacionEnMano: {x: 89.98, y: 180, z: 0}
+    escalaEnMano: 0.8
+  - id: cuchillo
+    nombre: CUCHILLO
+    prefab: {fileID: 7263706724232504439, guid: f3e43ed89d8591241921f8778bfc5157, type: 3}
+    desbloqueada: 1
+    icono: {fileID: 0}
+    posicionEnMano: {x: 0.02, y: 0.05, z: 0}
+    rotacionEnMano: {x: 16.58, y: 10.79, z: 125.45}
+    escalaEnMano: 0.55
   - id: mk18
     nombre: MK18
     prefab: {fileID: 8445519563704334207, guid: 52bac904701d4b743a052514cdc7c593, type: 3}
     desbloqueada: 0
     icono: {fileID: 0}
-    posicionEnMano: {x: 0, y: 0, z: 0}
-    rotacionEnMano: {x: 0, y: 0, z: 0}
-    escalaEnMano: 1.489442
+    posicionEnMano: {x: 0, y: 0.05, z: 0.01}
+    rotacionEnMano: {x: 89.98, y: 180, z: 0}
+    escalaEnMano: 1
   - id: c1911
     nombre: C1911
     prefab: {fileID: 3194321418108129306, guid: 3e7b69f564a9ca44ea53e47358313952, type: 3}
     desbloqueada: 0
     icono: {fileID: 0}
-    posicionEnMano: {x: 0, y: 0, z: 0}
-    rotacionEnMano: {x: 0, y: 0, z: 0}
-    escalaEnMano: 1.31
+    posicionEnMano: {x: 0, y: 0.05, z: 0.02}
+    rotacionEnMano: {x: 89.98, y: 180, z: 0}
+    escalaEnMano: 0.8
   - id: subfusil
     nombre: SMG5
     prefab: {fileID: 1286112718279850861, guid: 467285ff33457cd44844962ef95e483f, type: 3}
     desbloqueada: 0
     icono: {fileID: 0}
-    posicionEnMano: {x: 0, y: 0, z: 0}
-    rotacionEnMano: {x: 0, y: 0, z: 0}
-    escalaEnMano: 0.81
+    posicionEnMano: {x: 0, y: 0.05, z: 0.01}
+    rotacionEnMano: {x: 89.98, y: 180, z: 0}
+    escalaEnMano: 1
   - id: escopeta
     nombre: 590A1
     prefab: {fileID: 2956346148036594895, guid: 46d8ad259ce4a434f8d160189d242310, type: 3}
     desbloqueada: 0
     icono: {fileID: 0}
-    posicionEnMano: {x: 0, y: 0, z: 0}
-    rotacionEnMano: {x: 0, y: 0, z: 0}
-    escalaEnMano: 1.23
+    posicionEnMano: {x: 0, y: 0.05, z: 0.01}
+    rotacionEnMano: {x: 89.98, y: 180, z: 0}
+    escalaEnMano: 1
   - id: rifle
     nombre: R90
     prefab: {fileID: 1838008092219595164, guid: 9f7897ae1917641439e93686f9229b65, type: 3}
     desbloqueada: 0
     icono: {fileID: 0}
-    posicionEnMano: {x: 0, y: 0, z: 0}
-    rotacionEnMano: {x: 0, y: 0, z: 0}
-    escalaEnMano: 1.25
+    posicionEnMano: {x: 0, y: 0.05, z: 0.01}
+    rotacionEnMano: {x: 89.98, y: 180, z: 0}
+    escalaEnMano: 1
   weaponIconDisplay: {fileID: 0}
   switchSound: {fileID: 8300000, guid: e80fc2278d4c20a4cbc5ad6d14194bb9, type: 3}
   audioSource: {fileID: 1694322570579636112}
@@ -2575,7 +2555,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 0.5
   m_Pitch: 1
   Loop: 0
@@ -2660,6 +2640,32 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &8939504793477123657
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6928274526748635117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6aa47189cc8cb044a7b7cfc62e44d33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDeathSequence
+  camara: {fileID: 0}
+  vistaDeArmas: {fileID: 0}
+  respiroFinal: {fileID: 8300000, guid: 7a41067a878e13042baa87e06cad9805, type: 3}
+  fuenteDeVoz: {fileID: 1694322570579636112}
+  balanceoDeArmas: {fileID: 0}
+  duracionDeLaCaida: 0.95
+  alturaEnElSuelo: 0.28
+  avanceAlCaer: 0.35
+  giroAlCaer: 78
+  inclinacionFinal: -12
+  bote: 0.05
+  retrasoDelRespiro: 0.55
+  volumenDelRespiro: 0.9
+  temblorFinal: 0.6
 --- !u!1 &6996241961393783842
 GameObject:
   m_ObjectHideFlags: 0
@@ -3857,7 +3863,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RecargaBrazos
   animator: {fileID: 5306786676015931742}
   nombreClipRecarga: RELOAD1
-  duracionRecarga: 2.2
 --- !u!114 &7595051794415237094
 MonoBehaviour:
   m_ObjectHideFlags: 0

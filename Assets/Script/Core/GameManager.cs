@@ -31,6 +31,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float shopAutoCloseTime = 0f;
     [Tooltip("Congela el juego al morir.")]
     [SerializeField] private bool freezeOnDeath = true;
+    [Tooltip("Segundos que pasan desde que el jugador muere hasta que sale el cartel de " +
+             "GAME OVER. Deja que se vea la caída al suelo y se oiga el último respiro.")]
+    [SerializeField] private float retrasoDeGameOver = 3.2f;
 
     public GameState State { get; private set; } = GameState.Preparing;
     public int Kills { get; private set; }
@@ -176,8 +179,19 @@ public class GameManager : MonoBehaviour
         SetShopVisible(false);
         SetState(GameState.GameOver);
 
-        int round = roundManager != null ? Mathf.Max(1, roundManager.CurrentRound) : 1;
-        OnGameOver?.Invoke(round, Kills, MoneyEarned, ElapsedTime);
+        // El cartel NO sale al instante: primero se ve al jugador caer al suelo y se oye
+        // su último respiro (PlayerDeathSequence). Con tiempo REAL, para que la espera no
+        // dependa del timeScale. Los datos se congelan AQUI para que el resumen no cuente
+        // los segundos de la agonía.
+        int ronda = roundManager != null ? Mathf.Max(1, roundManager.CurrentRound) : 1;
+        StartCoroutine(MostrarGameOverConRetraso(ronda, Kills, MoneyEarned, ElapsedTime));
+    }
+
+    private IEnumerator MostrarGameOverConRetraso(int round, int kills, int moneyEarned, float elapsedSeconds)
+    {
+        if (retrasoDeGameOver > 0f) yield return new WaitForSecondsRealtime(retrasoDeGameOver);
+
+        OnGameOver?.Invoke(round, kills, moneyEarned, elapsedSeconds);
 
         if (freezeOnDeath) Time.timeScale = 0f;
     }

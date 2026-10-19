@@ -122,12 +122,31 @@ public class ZombieBrain : MonoBehaviour
     [Tooltip("Cada cuánto piensa cuando está CERCA (reacciona mucho más rápido).")]
     [SerializeField] private float intervaloDePensamientoCerca = 0.05f;
 
+    [Header("Fluidez del avance")]
+    [Tooltip("Velocidad (m/s) a la que el clip de correr se ve perfecto. Es a lo que se " +
+             "ajusta el ritmo de la animación para que los pies no patinen.")]
+    [SerializeField] private float velocidadDeReferenciaAnimacion = 3.4f;
+    [Tooltip("Ritmo mínimo de la animación.")]
+    [SerializeField] private float ritmoMinimo = 0.55f;
+    [Tooltip("Ritmo máximo de la animación.")]
+    [SerializeField] private float ritmoMaximo = 1.15f;
+    [Tooltip("Cuanto más alto, antes se estabiliza el parámetro Speed del Animator.")]
+    [SerializeField] private float suavizadoDeVelocidad = 9f;
+    [Tooltip("Aceleración real del agente (m/s²). Baja = arranca y frena suave, sin tirones.")]
+    [SerializeField] private float aceleracionDeVelocidad = 6f;
+
     private float siguientePensamiento;
     private float siguienteChequeoRapido;
     private float reaccionHasta;
     private bool yaTeVi;
     private float inicioDeVentana;
     private float distanciaAcumulada;
+
+    // Fluidez: la velocidad deseada se pide desde el tick lento, pero se aplica al agente
+    // cada frame y acercandose poco a poco. Antes saltaba de golpe y se veia robotico.
+    private float velocidadDeseada = 1.4f;
+    private float velocidadSuave;
+    private float ritmoBase = 1f;
 
     // Empujes suaves: se calculan cada cierto tiempo pero se APLICAN cada frame
     // multiplicados por Time.deltaTime (si no, el movimiento depende de los FPS).
@@ -210,7 +229,8 @@ public class ZombieBrain : MonoBehaviour
         // VARIEDAD: que no parezcan clones. Cada zombi va un pelín más rápido o más
         // lento, es algo más grande o más pequeño y golpea a otro ritmo. Es barato y en
         // una horda se nota muchísimo.
-        if (animador != null) animador.speed = Random.Range(0.92f, 1.09f);
+        if (animador != null) ritmoBase = Random.Range(0.92f, 1.09f);
+        velocidadDeseada = velocidadVagar;
         float escala = Random.Range(0.93f, 1.07f);
         transform.localScale = new Vector3(escala, escala, escala);
         cadenciaDeAtaque *= Random.Range(0.85f, 1.15f);
@@ -249,6 +269,7 @@ public class ZombieBrain : MonoBehaviour
         if (estado == Estado.Muerto || !AgenteListo) return;
 
         AplicarSeparacion();
+        SuavizarVelocidad();
 
         // REACCIÓN RÁPIDA: si el jugador está encima, este zombi NO espera su turno del
         // director: piensa enseguida. Es barato porque solo lo hacen los que están cerca.
@@ -277,6 +298,16 @@ public class ZombieBrain : MonoBehaviour
     }
 
     private bool AgenteListo => agente != null && agente.enabled && agente.isOnNavMesh;
+
+    /// <summary>
+    /// Lleva la velocidad del agente hacia la que se le pidió, poco a poco y cada frame.
+    /// Es lo que hace que arrancar, frenar al girar y acelerar al enderezar se vean
+    /// naturales en vez de a saltos.
+    /// </summary>
+    private void SuavizarVelocidad()
+    {
+        agente.speed = Mathf.MoveTowards(agente.speed, velocidadDeseada, aceleracionDeVelocidad * Time.deltaTime);
+    }
 
     /// <summary>
     /// Aparta suavemente al zombi de sus compañeros.
@@ -341,7 +372,20 @@ public class ZombieBrain : MonoBehaviour
     private void ActualizarAnimador()
     {
         if (animador == null || animador.runtimeAnimatorController == null) return;
-        animador.SetFloat("Speed", agente.velocity.magnitude);
+
+        float velocidad = agente != null ? agente.velocity.magnitude : 0f;
+
+        // El parámetro va suavizado: la velocidad del agente tiembla un poco y sin esto el
+        // zombi entraba y salía del estado de andar a tirones.
+        velocidadSuave = Mathf.Lerp(velocidadSuave, velocidad, 1f - Mathf.Exp(-suavizadoDeVelocidad * Time.deltaTime));
+        animador.SetFloat("Speed", velocidadSuave);
+
+        // RITMO DE LOS PASOS: la animación corre a la velocidad real del suelo. Sin esto el
+        // clip de correr se reproducía siempre al 55 % y los pies patinaban al perseguir.
+        float ritmo = Mathf.Clamp(velocidad / Mathf.Max(0.1f, velocidadDeReferenciaAnimacion), ritmoMinimo, ritmoMaximo);
+        bool enCombate = estado == Estado.Atacar || estado == Estado.Muerto;
+        animador.speed = enCombate ? ritmoBase : ritmoBase * ritmo;
+
         animador.SetBool("IsAttacking", estado == Estado.Atacar);
         animador.SetBool("IsDead", estado == Estado.Muerto);
     }
@@ -550,8 +594,7 @@ public class ZombieBrain : MonoBehaviour
         // Girar y correr a la vez se ve como patinar. Si el giro es grande se frena: el
         // zombi gira sobre sí mismo y luego acelera. Se ve mucho más natural.
         float angulo = hacia.sqrMagnitude > 0.01f ? Vector3.Angle(transform.forward, hacia) : 0f;
-        float velocidadFinal = angulo > 50f ? velocidad * 0.45f : velocidad;
-        if (!Mathf.Approximately(agente.speed, velocidadFinal)) agente.speed = velocidadFinal;
+        velocidadDeseada = angulo > 50f ? velocidad * 0.45f : velocidad;
 
         bool tocaPorTiempo = Time.time >= siguienteRuta;
         bool seMovioElDestino = (destino - ultimoDestino).sqrMagnitude > umbral * umbral;
@@ -692,6 +735,7 @@ public class ZombieBrain : MonoBehaviour
     private void Morir()
     {
         estado = Estado.Muerto;
+        velocidadDeseada = 0f;
         if (AgenteListo) agente.isStopped = true;
         if (audioZombi != null) audioZombi.SonarMuerte();
         ActualizarAnimador();

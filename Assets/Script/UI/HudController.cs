@@ -59,6 +59,7 @@ public class HudController : MonoBehaviour
     private readonly List<WeaponAmmo> weapons = new List<WeaponAmmo>();
     private readonly List<Image> bulletSlots = new List<Image>();
     private WeaponAmmo activeWeapon;
+    private KnifeWeapon activeMelee;
     private float messageHideTime;
     private float healthRatio = 1f;
     private float roundPunchStart = -10f;
@@ -112,7 +113,8 @@ public class HudController : MonoBehaviour
     {
         // El jugador cambia de arma: refrescamos el bloque de municion.
         WeaponAmmo current = FindActiveWeapon();
-        if (current != activeWeapon) RefreshWeapon();
+        KnifeWeapon melee = current == null ? FindActiveMelee() : null;
+        if (current != activeWeapon || melee != activeMelee) RefreshWeapon();
 
         if (messageText != null && messageText.text.Length > 0 && Time.time >= messageHideTime)
             ClearMessage();
@@ -184,6 +186,17 @@ public class HudController : MonoBehaviour
         return null;
     }
 
+    /// <summary>Arma cuerpo a cuerpo equipada (el cuchillo no tiene municion).</summary>
+    private KnifeWeapon FindActiveMelee()
+    {
+        if (activeMelee != null && activeMelee.gameObject.activeInHierarchy) return activeMelee;
+
+        foreach (KnifeWeapon k in FindObjectsByType<KnifeWeapon>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+            return k;   // los inactivos no los devuelve, asi que el primero es el equipado
+
+        return null;
+    }
+
     /// <summary>Vuelve a engancharse a las armas que existan ahora mismo (HUD de municion).</summary>
     public void RefrescarArmas()
     {
@@ -201,9 +214,11 @@ public class HudController : MonoBehaviour
     private void RefreshWeapon(bool force = false)
     {
         WeaponAmmo current = FindActiveWeapon();
-        if (!force && current == activeWeapon) return;
+        KnifeWeapon melee = current == null ? FindActiveMelee() : null;
+        if (!force && current == activeWeapon && melee == activeMelee) return;
 
         activeWeapon = current;
+        activeMelee = melee;
         UpdateWeaponIcon();
         UpdateAmmoText();
     }
@@ -216,8 +231,12 @@ public class HudController : MonoBehaviour
     {
         if (weaponIcon == null) return;
 
+        // El cuchillo no tiene WeaponAmmo pero SI tiene nombre e icono propios.
+        string nombre = activeWeapon != null ? activeWeapon.WeaponName
+                      : (activeMelee != null ? activeMelee.WeaponName : null);
+
         Sprite sprite = null;
-        if (iconLibrary != null && activeWeapon != null) sprite = iconLibrary.GetWeaponIcon(activeWeapon.WeaponName);
+        if (iconLibrary != null && !string.IsNullOrEmpty(nombre)) sprite = iconLibrary.GetWeaponIcon(nombre);
 
         weaponIcon.sprite = sprite;
         weaponIcon.enabled = sprite != null;
@@ -229,7 +248,7 @@ public class HudController : MonoBehaviour
         if (activeWeapon == null)
         {
             if (ammoText != null) ammoText.text = "-- / --";
-            if (weaponText != null) weaponText.text = string.Empty;
+            if (weaponText != null) weaponText.text = activeMelee != null ? activeMelee.WeaponName : string.Empty;
             UpdateBullets(0, 0);
             return;
         }

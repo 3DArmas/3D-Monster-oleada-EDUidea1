@@ -102,6 +102,7 @@ GameObject:
   - component: {fileID: 2406201776310495574}
   - component: {fileID: 4809233340825653901}
   - component: {fileID: 4386300283950528010}
+  - component: {fileID: 7652904532106558762}
   m_Layer: 0
   m_Name: SMG5
   m_TagString: Untagged
@@ -147,7 +148,7 @@ MonoBehaviour:
   maxAimDistance: 100
   damage: 18
   autoReloadWhenEmpty: 1
-  shootSound: {fileID: 8300000, guid: f201bc14716c1b4469ef02b6036fa40a, type: 3}
+  shootSound: {fileID: 8300000, guid: 85dc496d31758e440bd724d46f34f834, type: 3}
   audioSource: {fileID: 4386300283950528010}
 --- !u!114 &4809233340825653901
 MonoBehaviour:
@@ -165,9 +166,9 @@ MonoBehaviour:
   magazineSize: 35
   startingReserve: 210
   maxReserve: 210
-  reloadTime: 1.7
-  reloadSound: {fileID: 8300000, guid: 1dbde56d88948a34ba30c19e5d886a41, type: 3}
-  emptySound: {fileID: 8300000, guid: dd81254d35ec6a34db14d80c291388aa, type: 3}
+  reloadTime: 1.35
+  reloadSound: {fileID: 8300000, guid: 07336edd730d8564eabe1d2789b3596a, type: 3}
+  emptySound: {fileID: 8300000, guid: ba1ff6e325a8c3b41b5619b07eaab352, type: 3}
   audioSource: {fileID: 4386300283950528010}
   autoReloadWhenEmpty: 1
   autoReloadDelay: 0.25
@@ -268,6 +269,32 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &7652904532106558762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1286112718279850861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c99eb14d547b9f47b05cbbc3211c0fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponAnim
+  tipo: 3
+  tiempoDeSaque: 0.22
+  caidaAlSacar: 0.14
+  inclinacionAlSacar: 18
+  retrocesoAtras: 0.032
+  retrocesoArriba: 5
+  retrocesoDureza: 17
+  recargaBajada: 0.05
+  recargaAtras: 0.03
+  recargaPitch: 26
+  recargaRoll: -30
+  recargaTraqueteo: 0.013
+  anguloCorte: 55
+  duracionCorte: 0.18
 --- !u!1 &1733827390185589668
 GameObject:
   m_ObjectHideFlags: 0

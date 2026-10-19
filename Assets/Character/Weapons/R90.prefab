@@ -141,6 +141,7 @@ GameObject:
   - component: {fileID: 5726495229843828568}
   - component: {fileID: 2675479326403899868}
   - component: {fileID: 3246844648739504983}
+  - component: {fileID: 3062040289864456792}
   m_Layer: 0
   m_Name: R90
   m_TagString: Untagged
@@ -186,7 +187,7 @@ MonoBehaviour:
   maxAimDistance: 100
   damage: 150
   autoReloadWhenEmpty: 1
-  shootSound: {fileID: 8300000, guid: c75c78b8fe1e2184d9f1331968460fe5, type: 3}
+  shootSound: {fileID: 8300000, guid: 72ad21a8af9a72948b32741be2e02f13, type: 3}
   audioSource: {fileID: 3246844648739504983}
 --- !u!114 &2675479326403899868
 MonoBehaviour:
@@ -204,9 +205,9 @@ MonoBehaviour:
   magazineSize: 5
   startingReserve: 30
   maxReserve: 30
-  reloadTime: 2.8
-  reloadSound: {fileID: 8300000, guid: 1dbde56d88948a34ba30c19e5d886a41, type: 3}
-  emptySound: {fileID: 8300000, guid: dd81254d35ec6a34db14d80c291388aa, type: 3}
+  reloadTime: 1.85
+  reloadSound: {fileID: 8300000, guid: 86e27bace567aa1498435ae7cd17a42a, type: 3}
+  emptySound: {fileID: 8300000, guid: ba1ff6e325a8c3b41b5619b07eaab352, type: 3}
   audioSource: {fileID: 3246844648739504983}
   autoReloadWhenEmpty: 1
   autoReloadDelay: 0.25
@@ -307,6 +308,32 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3062040289864456792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1838008092219595164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c99eb14d547b9f47b05cbbc3211c0fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponAnim
+  tipo: 4
+  tiempoDeSaque: 0.22
+  caidaAlSacar: 0.14
+  inclinacionAlSacar: 18
+  retrocesoAtras: 0.032
+  retrocesoArriba: 5
+  retrocesoDureza: 17
+  recargaBajada: 0.075
+  recargaAtras: 0.03
+  recargaPitch: 20
+  recargaRoll: -22
+  recargaTraqueteo: 0.008
+  anguloCorte: 55
+  duracionCorte: 0.18
 --- !u!1 &2019161368520595901
 GameObject:
   m_ObjectHideFlags: 0

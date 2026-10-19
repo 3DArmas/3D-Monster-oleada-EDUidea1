@@ -37,6 +37,7 @@ public class Shot : MonoBehaviour
     private InputAction fireAction;
     private InputAction reloadAction;
     private float nextShotTime = 0f;
+    private WeaponAnim animacion;
 
     /// <summary>Avisa cada vez que un arma dispara (lo usan el retroceso y el fogonazo).</summary>
     public static event System.Action OnAnyShot;
@@ -65,6 +66,10 @@ public class Shot : MonoBehaviour
 
         if (ammo == null)
             ammo = GetComponent<WeaponAmmo>();
+
+        // Animacion propia del arma (retroceso y recarga). Es opcional: si el prefab no
+        // la tiene, el arma funciona igual. Aqui solo se cachea.
+        animacion = GetComponent<WeaponAnim>();
 
         // El punto de disparo tiene que ser un hijo DE ESTE prefab. Al copiar el Shot de
         // otra arma la referencia apunta fuera y se pierde al guardar, asi que si falta
@@ -165,5 +170,8 @@ public class Shot : MonoBehaviour
 
         if (shootSound != null && audioSource != null)
             audioSource.PlayOneShot(shootSound);
+
+        // Patada del arma: es lo que hace que el disparo "se sienta".
+        if (animacion != null) animacion.Disparar();
     }
 }

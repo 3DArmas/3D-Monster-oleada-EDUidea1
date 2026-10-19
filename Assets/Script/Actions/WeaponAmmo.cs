@@ -31,6 +31,19 @@ public class WeaponAmmo : MonoBehaviour
     public bool IsMagazineFull => Magazine >= magazineSize;
     public bool IsFull => IsMagazineFull && Reserve >= maxReserve;
 
+    /// <summary>Cuanto dura la recarga de ESTA arma (lo usa la animacion del arma).</summary>
+    public float ReloadDuration => reloadTime;
+
+    /// <summary>Por donde va la recarga, de 0 a 1 (0 = recien empezada, 1 = terminada).</summary>
+    public float ReloadProgress
+    {
+        get
+        {
+            if (!IsReloading || reloadTime <= 0f) return 0f;
+            return Mathf.Clamp01(1f - (recargaTerminaEn - Time.time) / reloadTime);
+        }
+    }
+
     /// <summary>Se dispara con (cargador, reserva) cada vez que cambia la municion.</summary>
     public event Action<int, int> OnAmmoChanged;
     /// <summary>Se dispara cuando se intenta disparar sin balas.</summary>

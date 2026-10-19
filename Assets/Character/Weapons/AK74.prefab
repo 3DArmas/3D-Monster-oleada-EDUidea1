@@ -413,6 +413,7 @@ GameObject:
   - component: {fileID: 1764428563152450552}
   - component: {fileID: 3904109832248575277}
   - component: {fileID: 6871047003330574904}
+  - component: {fileID: 8450050459774930701}
   m_Layer: 0
   m_Name: AK74
   m_TagString: Untagged
@@ -517,7 +518,7 @@ MonoBehaviour:
   maxAimDistance: 100
   damage: 45
   autoReloadWhenEmpty: 1
-  shootSound: {fileID: 8300000, guid: c75c78b8fe1e2184d9f1331968460fe5, type: 3}
+  shootSound: {fileID: 8300000, guid: 926cc39f4ac2cd745b20fa0f1a012230, type: 3}
   audioSource: {fileID: 3904109832248575277}
 --- !u!82 &3904109832248575277
 AudioSource:
@@ -628,16 +629,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bac9dd5d3668344b9cfa42a80667e89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeaponAmmo
-  weaponName: AK74
-  magazineSize: 12
-  startingReserve: 96
-  maxReserve: 96
-  reloadTime: 1.8
-  reloadSound: {fileID: 8300000, guid: 1dbde56d88948a34ba30c19e5d886a41, type: 3}
-  emptySound: {fileID: 8300000, guid: dd81254d35ec6a34db14d80c291388aa, type: 3}
+  weaponName: AK47
+  magazineSize: 25
+  startingReserve: 125
+  maxReserve: 250
+  reloadTime: 1.85
+  reloadSound: {fileID: 8300000, guid: 86e27bace567aa1498435ae7cd17a42a, type: 3}
+  emptySound: {fileID: 8300000, guid: ba1ff6e325a8c3b41b5619b07eaab352, type: 3}
   audioSource: {fileID: 3904109832248575277}
   autoReloadWhenEmpty: 1
   autoReloadDelay: 0.25
+--- !u!114 &8450050459774930701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6761893087589767841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c99eb14d547b9f47b05cbbc3211c0fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponAnim
+  tipo: 1
+  tiempoDeSaque: 0.22
+  caidaAlSacar: 0.14
+  inclinacionAlSacar: 18
+  retrocesoAtras: 0.032
+  retrocesoArriba: 5
+  retrocesoDureza: 17
+  recargaBajada: 0.055
+  recargaAtras: 0.03
+  recargaPitch: 22
+  recargaRoll: -26
+  recargaTraqueteo: 0.011
+  anguloCorte: 55
+  duracionCorte: 0.18
 --- !u!1 &7216421989920598435
 GameObject:
   m_ObjectHideFlags: 0

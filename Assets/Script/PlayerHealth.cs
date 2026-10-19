@@ -58,8 +58,11 @@ public class PlayerHealth : MonoBehaviour, IDamageable
         if (isDead) return;
         isDead = true;
 
+        // Se suelta el raton para que las armas dejen de disparar (Shot y KnifeWeapon solo
+        // disparan con el cursor bloqueado), pero se OCULTA: el cursor aparece cuando
+        // sale el cartel de GAME OVER, no mientras el jugador se desploma.
         Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        Cursor.visible = false;
 
         var fpc = GetComponent<FirstPersonController>();
         if (fpc != null) fpc.enabled = false;
